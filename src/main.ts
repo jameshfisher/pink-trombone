@@ -1,12 +1,50 @@
-Math.clamp = function (number, min, max) {
+interface Math {
+  clamp(number: number, min: number, max: number): number;
+  moveTowards(
+    current: number,
+    target: number,
+    amountUp: number,
+    amountDown: number
+  ): number;
+  gaussian(): number;
+}
+
+declare var IMAGINARY: {
+  i18n: {
+    getLang(): unknown;
+    t: (text: string) => string;
+    init: (args: {
+      queryStringVariable: string;
+      translationsDirectory: string;
+      defaultLanguage: string;
+    }) => Promise<unknown>;
+  };
+};
+
+type TouchT = {
+  startTime: number;
+  endTime: number;
+  fricative_intensity: number;
+  alive: boolean;
+  id: unknown;
+  x: number;
+  y: number;
+  index: number;
+  diameter: number;
+};
+
+type Transient = {
+  strength: number;
+  exponent: any;
+  timeAlive: number;
+  position: any;
+  lifeTime: any;
+};
+
+Math.clamp = function (number: number, min: number, max: number) {
   if (number < min) return min;
   else if (number > max) return max;
   else return number;
-};
-
-Math.moveTowards = function (current, target, amount) {
-  if (current < target) return Math.min(current + amount, target);
-  else return Math.max(current - amount, target);
 };
 
 Math.moveTowards = function (current, target, amountUp, amountDown) {
@@ -20,12 +58,12 @@ Math.gaussian = function () {
   return (s - 8) / 4;
 };
 
-var backCanvas = document.getElementById("backCanvas");
-var backCtx = backCanvas.getContext("2d");
-var tractCanvas = document.getElementById("tractCanvas");
-var tractCtx = tractCanvas.getContext("2d");
+const backCanvas = document.getElementById("backCanvas") as HTMLCanvasElement;
+const backCtx = backCanvas.getContext("2d") as CanvasRenderingContext2D;
+const tractCanvas = document.getElementById("tractCanvas") as HTMLCanvasElement;
+const tractCtx = tractCanvas.getContext("2d") as CanvasRenderingContext2D;
 
-var sampleRate;
+var sampleRate: number;
 var time = 0;
 var temp = { a: 0, b: 0 };
 var alwaysVoice = false;
@@ -37,57 +75,112 @@ var isFirefox = false;
 var browser = navigator.userAgent.toLowerCase();
 if (browser.indexOf("firefox") > -1) isFirefox = true;
 
-var UI = {
-  width: 600,
-  top_margin: 5,
-  left_margin: 5,
-  inAboutScreen: false,
-  inInstructionsScreen: false,
-  instructionsLine: 0,
-  debugText: "",
+class UIClass {
+  init() {
+    throw new Error("Method not implemented.");
+  }
+  width: number;
+  top_margin: number;
+  left_margin: number;
+  inAboutScreen: boolean;
+  inInstructionsScreen: boolean;
+  instructionsLine: number;
+  debugText: string;
+  touchesWithMouse: TouchT[];
+  mouseTouch: TouchT;
+  mouseDown: boolean;
+  aboutButton: {
+    x: null;
+    y: null;
+    width: null;
+    height: null;
+    text: null;
+    switchedOn: any;
+    draw: (ctx: any) => void;
+    drawText: (ctx: any) => void;
+    handleTouchStart: (touch: any) => void;
+  };
+  alwaysVoiceButton: {
+    x: null;
+    y: null;
+    width: null;
+    height: null;
+    text: null;
+    switchedOn: any;
+    draw: (ctx: any) => void;
+    drawText: (ctx: any) => void;
+    handleTouchStart: (touch: any) => void;
+  };
+  autoWobbleButton: {
+    x: null;
+    y: null;
+    width: null;
+    height: null;
+    text: null;
+    switchedOn: any;
+    draw: (ctx: any) => void;
+    drawText: (ctx: any) => void;
+    handleTouchStart: (touch: any) => void;
+  };
 
-  init: function () {
+  constructor() {
+    this.width = 600;
+    this.top_margin = 5;
+    this.left_margin = 5;
+    this.inAboutScreen = false;
+    this.inInstructionsScreen = false;
+    this.instructionsLine = 0;
+    this.debugText = "";
+
     this.touchesWithMouse = [];
-    this.mouseTouch = { alive: false, endTime: 0 };
+    this.mouseTouch = {
+      id: 0,
+      x: 0,
+      y: 0,
+      index: 0,
+      diameter: 0,
+      alive: false,
+      startTime: 0,
+      endTime: 0,
+      fricative_intensity: 0,
+    };
     this.mouseDown = false;
 
-    // this.aboutButton = makeButton(460, 392, 140, 30, "about...", true);
     this.aboutButton = nullButton(true);
-    //this.alwaysVoiceButton = makeButton(460, 428, 140, 30, "always voice", true);
     this.alwaysVoiceButton = nullButton(false);
-    //this.autoWobbleButton = makeButton(460, 464, 140, 30, "pitch wobble", true);
     this.autoWobbleButton = nullButton(false);
 
-    tractCanvas.addEventListener("touchstart", UI.startTouches);
-    tractCanvas.addEventListener("touchmove", UI.moveTouches);
-    tractCanvas.addEventListener("touchend", UI.endTouches);
-    tractCanvas.addEventListener("touchcancel", UI.endTouches);
+    tractCanvas.addEventListener("touchstart", this.startTouches);
+    tractCanvas.addEventListener("touchmove", this.moveTouches);
+    tractCanvas.addEventListener("touchend", this.endTouches);
+    tractCanvas.addEventListener("touchcancel", this.endTouches);
 
     document.addEventListener("touchstart", function (event) {
       event.preventDefault();
     });
 
-    document.addEventListener("mousedown", function (event) {
-      UI.mouseDown = true;
+    document.addEventListener("mousedown", (event) => {
+      this.mouseDown = true;
       event.preventDefault();
-      UI.startMouse(event);
+      this.startMouse(event);
     });
-    document.addEventListener("mouseup", function (event) {
-      UI.mouseDown = false;
-      UI.endMouse(event);
+    document.addEventListener("mouseup", (event) => {
+      this.mouseDown = false;
+      this.endMouse(event);
     });
-    document.addEventListener("mousemove", UI.moveMouse);
-  },
 
-  draw: function () {
+    document.addEventListener("mousemove", this.moveMouse);
+  }
+
+  draw(this: UIClass) {
     this.alwaysVoiceButton.draw(tractCtx);
     this.autoWobbleButton.draw(tractCtx);
     this.aboutButton.draw(tractCtx);
     if (this.inAboutScreen) this.drawAboutScreen();
     else if (this.inInstructionsScreen) this.drawInstructionsScreen();
-  },
+  }
 
-  drawAboutScreen: function () {
+  drawAboutScreen() {
     var ctx = tractCtx;
     ctx.globalAlpha = 0.8;
     ctx.fillStyle = "white";
@@ -95,9 +188,9 @@ var UI = {
     ctx.fill();
 
     this.drawAboutText();
-  },
+  }
 
-  drawAboutText: function () {
+  drawAboutText() {
     var ctx = tractCtx;
     ctx.globalAlpha = 1.0;
     ctx.fillStyle = "#C070C6";
@@ -122,9 +215,9 @@ var UI = {
         430
       );
     }
-  },
+  }
 
-  drawInstructionsScreen: function () {
+  drawInstructionsScreen(this: any) {
     AudioSystem.mute();
     var ctx = tractCtx;
     ctx.globalAlpha = 0.85;
@@ -181,102 +274,104 @@ var UI = {
         ctx.fill();*/
 
     ctx.globalAlpha = 1.0;
-  },
+  }
 
-  instructionsScreenHandleTouch: function (x, y) {
+  instructionsScreenHandleTouch(x, y) {
     if (x >= 35 && x <= 265 && y >= 535 && y <= 570)
       window.location.href = "http://venuspatrol.nfshost.com";
-    else if (x >= 370 && x <= 570 && y >= 505 && y <= 555)
-      location.reload(false);
+    else if (x >= 370 && x <= 570 && y >= 505 && y <= 555) location.reload();
     else {
       UI.inInstructionsScreen = false;
       UI.aboutButton.switchedOn = true;
       AudioSystem.unmute();
     }
-  },
+  }
 
-  write: function (text) {
+  write(text) {
     tractCtx.fillText(text, 50, 100 + this.instructionsLine * 22);
     this.instructionsLine += 1;
     if (text == "") this.instructionsLine -= 0.3;
-  },
+  }
 
-  buttonsHandleTouchStart: function (touch) {
+  buttonsHandleTouchStart(touch) {
     this.alwaysVoiceButton.handleTouchStart(touch);
     alwaysVoice = this.alwaysVoiceButton.switchedOn;
     this.autoWobbleButton.handleTouchStart(touch);
     autoWobble = this.autoWobbleButton.switchedOn;
     this.aboutButton.handleTouchStart(touch);
-  },
+  }
 
-  startTouches: function (event) {
+  startTouches(event) {
     event.preventDefault();
     if (!AudioSystem.started) {
       AudioSystem.started = true;
       AudioSystem.startSound();
     }
 
-    if (UI.inAboutScreen) {
+    if (this.inAboutScreen) {
       UI.inAboutScreen = false;
       return;
     }
 
-    if (UI.inInstructionsScreen) {
+    if (this.inInstructionsScreen) {
       var touches = event.changedTouches;
       for (var j = 0; j < touches.length; j++) {
-        var x = ((touches[j].pageX - UI.left_margin) / UI.width) * 600;
-        var y = ((touches[j].pageY - UI.top_margin) / UI.width) * 600;
+        var x = ((touches[j].pageX - this.left_margin) / this.width) * 600;
+        var y = ((touches[j].pageY - this.top_margin) / this.width) * 600;
       }
-      UI.instructionsScreenHandleTouch(x, y);
+      this.instructionsScreenHandleTouch(x, y);
       return;
     }
 
     var touches = event.changedTouches;
     for (var j = 0; j < touches.length; j++) {
-      var touch = {};
-      touch.startTime = time;
-      touch.endTime = 0;
-      touch.fricative_intensity = 0;
-      touch.alive = true;
-      touch.id = touches[j].identifier;
-      touch.x = ((touches[j].pageX - UI.left_margin) / UI.width) * 600;
-      touch.y = ((touches[j].pageY - UI.top_margin) / UI.width) * 600;
-      touch.index = TractUI.getIndex(touch.x, touch.y);
-      touch.diameter = TractUI.getDiameter(touch.x, touch.y);
-      UI.touchesWithMouse.push(touch);
-      UI.buttonsHandleTouchStart(touch);
+      const x = ((touches[j].pageX - this.left_margin) / this.width) * 600;
+      const y = ((touches[j].pageY - this.top_margin) / this.width) * 600;
+      var touch: TouchT = {
+        startTime: time,
+        endTime: 0,
+        fricative_intensity: 0,
+        alive: true,
+        id: touches[j].identifier,
+        x: x,
+        y: y,
+        index: TractUI.getIndex(x, y),
+        diameter: TractUI.getDiameter(x, y),
+      };
+      this.touchesWithMouse.push(touch);
+      this.buttonsHandleTouchStart(touch);
     }
 
-    UI.handleTouches();
-  },
+    this.handleTouches();
+  }
 
-  getTouchById: function (id) {
+  getTouchById(id) {
     for (var j = 0; j < UI.touchesWithMouse.length; j++) {
       if (UI.touchesWithMouse[j].id == id && UI.touchesWithMouse[j].alive)
         return UI.touchesWithMouse[j];
     }
-    return 0;
-  },
+    return null;
+  }
 
-  moveTouches: function (event) {
+  moveTouches(event) {
     var touches = event.changedTouches;
     for (var j = 0; j < touches.length; j++) {
       var touch = UI.getTouchById(touches[j].identifier);
-      if (touch != 0) {
+      if (touch !== null) {
         touch.x = ((touches[j].pageX - UI.left_margin) / UI.width) * 600;
         touch.y = ((touches[j].pageY - UI.top_margin) / UI.width) * 600;
         touch.index = TractUI.getIndex(touch.x, touch.y);
         touch.diameter = TractUI.getDiameter(touch.x, touch.y);
       }
     }
-    UI.handleTouches();
-  },
+    this.handleTouches();
+  }
 
-  endTouches: function (event) {
+  endTouches(event) {
     var touches = event.changedTouches;
     for (var j = 0; j < touches.length; j++) {
-      var touch = UI.getTouchById(touches[j].identifier);
-      if (touch != 0) {
+      var touch = this.getTouchById(touches[j].identifier);
+      if (touch !== null) {
         touch.alive = false;
         touch.endTime = time;
       }
@@ -286,41 +381,45 @@ var UI = {
     if (!UI.aboutButton.switchedOn) {
       UI.inInstructionsScreen = true;
     }
-  },
+  }
 
-  startMouse: function (event) {
+  startMouse(event) {
     if (!AudioSystem.started) {
       AudioSystem.started = true;
       AudioSystem.startSound();
     }
-    if (UI.inAboutScreen) {
+    if (this.inAboutScreen) {
       UI.inAboutScreen = false;
       return;
     }
-    if (UI.inInstructionsScreen) {
-      var x = ((event.pageX - tractCanvas.offsetLeft) / UI.width) * 600;
-      var y = ((event.pageY - tractCanvas.offsetTop) / UI.width) * 600;
+    if (this.inInstructionsScreen) {
+      let x = ((event.pageX - tractCanvas.offsetLeft) / UI.width) * 600;
+      let y = ((event.pageY - tractCanvas.offsetTop) / UI.width) * 600;
       UI.instructionsScreenHandleTouch(x, y);
       return;
     }
 
-    var touch = {};
-    touch.startTime = time;
-    touch.fricative_intensity = 0;
-    touch.endTime = 0;
-    touch.alive = true;
-    touch.id = "mouse" + Math.random();
-    touch.x = ((event.pageX - tractCanvas.offsetLeft) / UI.width) * 600;
-    touch.y = ((event.pageY - tractCanvas.offsetTop) / UI.width) * 600;
-    touch.index = TractUI.getIndex(touch.x, touch.y);
-    touch.diameter = TractUI.getDiameter(touch.x, touch.y);
-    UI.mouseTouch = touch;
-    UI.touchesWithMouse.push(touch);
-    UI.buttonsHandleTouchStart(touch);
-    UI.handleTouches();
-  },
+    const x = ((event.pageX - tractCanvas.offsetLeft) / UI.width) * 600;
+    const y = ((event.pageY - tractCanvas.offsetTop) / UI.width) * 600;
+    var touch: TouchT = {
+      startTime: time,
+      fricative_intensity: 0,
+      endTime: 0,
+      alive: true,
+      id: "mouse" + Math.random(),
+      x: x,
+      y: y,
+      index: TractUI.getIndex(x, y),
+      diameter: TractUI.getDiameter(x, y),
+    };
 
-  moveMouse: function (event) {
+    this.mouseTouch = touch;
+    this.touchesWithMouse.push(touch);
+    this.buttonsHandleTouchStart(touch);
+    this.handleTouches();
+  }
+
+  moveMouse(event) {
     var touch = UI.mouseTouch;
     if (!touch.alive) return;
     touch.x = ((event.pageX - tractCanvas.offsetLeft) / UI.width) * 600;
@@ -328,9 +427,9 @@ var UI = {
     touch.index = TractUI.getIndex(touch.x, touch.y);
     touch.diameter = TractUI.getDiameter(touch.x, touch.y);
     UI.handleTouches();
-  },
+  }
 
-  endMouse: function (event) {
+  endMouse(event) {
     var touch = UI.mouseTouch;
     if (!touch.alive) return;
     touch.alive = false;
@@ -338,19 +437,19 @@ var UI = {
     UI.handleTouches();
 
     if (!UI.aboutButton.switchedOn) UI.inInstructionsScreen = true;
-  },
+  }
 
-  handleTouches: function (event) {
+  handleTouches() {
     TractUI.handleTouches();
     Glottis.handleTouches();
-  },
+  }
 
-  updateTouches: function () {
+  updateTouches() {
     var fricativeAttackTime = 0.1;
-    for (var j = UI.touchesWithMouse.length - 1; j >= 0; j--) {
-      var touch = UI.touchesWithMouse[j];
+    for (var j = this.touchesWithMouse.length - 1; j >= 0; j--) {
+      var touch = this.touchesWithMouse[j];
       if (!touch.alive && time > touch.endTime + 1) {
-        UI.touchesWithMouse.splice(j, 1);
+        this.touchesWithMouse.splice(j, 1);
       } else if (touch.alive) {
         touch.fricative_intensity = Math.clamp(
           (time - touch.startTime) / fricativeAttackTime,
@@ -365,9 +464,9 @@ var UI = {
         );
       }
     }
-  },
+  }
 
-  shapeToFitScreen: function () {
+  shapeToFitScreen() {
     if (window.innerWidth <= window.innerHeight) {
       this.width = window.innerWidth - 80;
       this.left_margin = 40;
@@ -377,30 +476,43 @@ var UI = {
       this.left_margin = 0.5 * (window.innerWidth - this.width);
       this.top_margin = 40;
     }
-    document.body.style.marginLeft = this.left_margin;
-    document.body.style.marginTop = this.top_margin;
-    tractCanvas.style.width = this.width;
-    backCanvas.style.width = this.width;
-  },
-};
 
-var AudioSystem = {
+    document.body.style.marginLeft = this.left_margin + "px";
+    document.body.style.marginTop = this.top_margin + "px";
+    tractCanvas.style.width = this.width + "px";
+    backCanvas.style.width = this.width + "px";
+  }
+}
+
+let UI: UIClass;
+
+class AudioSystemClass {
+  init() {
+    throw new Error("Method not implemented.");
+  }
+  started: any;
+  blockLength: number;
+  blockTime: number;
+  soundOn: boolean;
+  audioContext: AudioContext;
+  scriptProcessor: any;
+
   // blockLength Can be set to 512 for more responsiveness but
   // potential crackling if CPU can't fill the buffer fast enough (latency)
-  blockLength: 2048,
-  blockTime: 1,
-  started: false,
-  soundOn: false,
 
-  init: function () {
-    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+  constructor() {
+    this.blockLength = 2048;
+    this.blockTime = 1;
+    this.started = false;
+    this.soundOn = false;
+
     this.audioContext = new window.AudioContext();
     sampleRate = this.audioContext.sampleRate;
 
     this.blockTime = this.blockLength / sampleRate;
-  },
+  }
 
-  startSound: function () {
+  startSound() {
     //scriptProcessor may need a dummy input channel on iOS
     this.scriptProcessor = this.audioContext.createScriptProcessor(
       this.blockLength,
@@ -427,9 +539,9 @@ var AudioSystem = {
     fricativeFilter.connect(this.scriptProcessor);
 
     whiteNoise.start(0);
-  },
+  }
 
-  createWhiteNoiseNode: function (frameCount) {
+  createWhiteNoiseNode(frameCount) {
     var myArrayBuffer = this.audioContext.createBuffer(
       1,
       frameCount,
@@ -446,9 +558,9 @@ var AudioSystem = {
     source.loop = true;
 
     return source;
-  },
+  }
 
-  doScriptProcessor: function (event) {
+  doScriptProcessor(event) {
     var inputArray1 = event.inputBuffer.getChannelData(0);
     var inputArray2 = event.inputBuffer.getChannelData(1);
     var outArray = event.outputBuffer.getChannelData(0);
@@ -467,52 +579,93 @@ var AudioSystem = {
     }
     Glottis.finishBlock();
     Tract.finishBlock();
-  },
+  }
 
-  mute: function () {
+  mute() {
     this.scriptProcessor.disconnect();
-  },
+  }
 
-  unmute: function () {
+  unmute() {
     this.scriptProcessor.connect(this.audioContext.destination);
-  },
-};
+  }
+}
 
-var Glottis = {
-  timeInWaveform: 0,
-  oldFrequency: 140,
-  newFrequency: 140,
-  UIFrequency: 140,
-  smoothFrequency: 140,
-  oldTenseness: 0.6,
-  newTenseness: 0.6,
-  UITenseness: 0.6,
-  totalTime: 0,
-  vibratoAmount: 0.005,
-  vibratoFrequency: 6,
-  intensity: 0,
-  loudness: 1,
-  isTouched: false,
-  isTouchingSomewhere: false,
-  ctx: backCtx,
-  touch: 0,
-  x: 240,
-  y: 530,
+let AudioSystem: AudioSystemClass;
 
-  keyboardTop: 500,
-  keyboardLeft: 0,
-  keyboardWidth: 600,
-  keyboardHeight: 100,
-  semitones: 20,
-  marks: [0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0],
-  baseNote: 87.3071, //F
+class GlottisClass {
+  init() {
+    throw new Error("Method not implemented.");
+  }
+  timeInWaveform: number;
+  oldFrequency: number;
+  newFrequency: number;
+  UIFrequency: number;
+  smoothFrequency: number;
+  oldTenseness: number;
+  newTenseness: number;
+  UITenseness: number;
+  totalTime: number;
+  vibratoAmount: number;
+  vibratoFrequency: number;
+  intensity: number;
+  loudness: number;
+  isTouched: boolean;
+  isTouchingSomewhere: boolean;
+  ctx: CanvasRenderingContext2D;
+  touch: TouchT | null;
+  x: number;
+  y: number;
+  keyboardTop: number;
+  keyboardLeft: number;
+  keyboardWidth: number;
+  keyboardHeight: number;
+  semitones: number;
+  marks: number[];
+  baseNote: number;
+  waveformLength: any;
+  frequency: number;
+  Rd: number;
+  alpha: number;
+  E0: number;
+  epsilon: number;
+  shift: number;
+  Delta: number;
+  Te: number;
+  omega: number;
 
-  init: function () {
+  constructor() {
+    this.timeInWaveform = 0;
+    this.oldFrequency = 140;
+    this.newFrequency = 140;
+    this.UIFrequency = 140;
+    this.smoothFrequency = 140;
+    this.oldTenseness = 0.6;
+    this.newTenseness = 0.6;
+    this.UITenseness = 0.6;
+    this.totalTime = 0;
+    this.vibratoAmount = 0.005;
+    this.vibratoFrequency = 6;
+    this.intensity = 0;
+    this.loudness = 1;
+    this.isTouched = false;
+    this.isTouchingSomewhere = false;
+    this.ctx = backCtx;
+    this.touch = null;
+    this.x = 240;
+    this.y = 530;
+    this.keyboardTop = 500;
+    this.keyboardLeft = 0;
+    this.keyboardWidth = 600;
+    this.keyboardHeight = 100;
+    this.semitones = 20;
+    this.marks = [0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0];
+    this.baseNote = 87.3071; // F
+
     this.setupWaveform(0);
     this.drawKeyboard();
-  },
+  }
 
-  drawKeyboard: function () {
+  drawKeyboard() {
     this.ctx.strokeStyle = palePink;
     this.ctx.fillStyle = palePink;
     backCtx.globalAlpha = 1.0;
@@ -569,9 +722,9 @@ var Glottis = {
     this.drawArrow(80, 2, 10);
     backCtx.restore();
     backCtx.globalAlpha = 1.0;
-  },
+  }
 
-  drawBar: function (topFactor, bottomFactor, radius) {
+  drawBar(topFactor, bottomFactor, radius) {
     backCtx.lineWidth = radius * 2;
     backCtx.beginPath();
     backCtx.moveTo(
@@ -593,9 +746,9 @@ var Glottis = {
     backCtx.closePath();
     backCtx.stroke();
     backCtx.fill();
-  },
+  }
 
-  drawArrow: function (l, ahw, ahl) {
+  drawArrow(l, ahw, ahl) {
     backCtx.lineWidth = 2;
     backCtx.beginPath();
     backCtx.moveTo(-l, 0);
@@ -607,15 +760,15 @@ var Glottis = {
     backCtx.closePath();
     backCtx.stroke();
     backCtx.fill();
-  },
+  }
 
-  handleTouches: function () {
+  handleTouches() {
     this.isTouchingSomewhere = false;
-    if (this.touch != 0 && !this.touch.alive) {
-      this.touch = 0;
+    if (this.touch != null && !this.touch.alive) {
+      this.touch = null;
     }
 
-    if (this.touch == 0) {
+    if (this.touch == null) {
       for (var j = 0; j < UI.touchesWithMouse.length; j++) {
         var touch = UI.touchesWithMouse[j];
         if (!touch.alive) continue;
@@ -625,7 +778,7 @@ var Glottis = {
       }
     }
 
-    if (this.touch != 0) {
+    if (this.touch != null) {
       this.isTouchingSomewhere = true;
       var local_y = this.touch.y - this.keyboardTop - 10;
       var local_x = this.touch.x - this.keyboardLeft;
@@ -640,10 +793,10 @@ var Glottis = {
       this.x = this.touch.x;
       this.y = local_y + this.keyboardTop + 10;
     }
-    Glottis.isTouched = this.touch != 0;
-  },
+    Glottis.isTouched = this.touch != null;
+  }
 
-  runStep: function (lambda, noiseSource) {
+  runStep(lambda, noiseSource) {
     var timeStep = 1.0 / sampleRate;
     this.timeInWaveform += timeStep;
     this.totalTime += timeStep;
@@ -662,9 +815,9 @@ var Glottis = {
     aspiration *= 0.2 + 0.02 * noise.simplex1(this.totalTime * 1.99);
     out += aspiration;
     return out;
-  },
+  }
 
-  getNoiseModulator: function () {
+  getNoiseModulator() {
     var voiced =
       0.1 +
       0.2 *
@@ -677,9 +830,9 @@ var Glottis = {
       this.UITenseness * this.intensity * voiced +
       (1 - this.UITenseness * this.intensity) * 0.3
     );
-  },
+  }
 
-  finishBlock: function () {
+  finishBlock() {
     var vibrato = 0;
     vibrato +=
       this.vibratoAmount *
@@ -714,9 +867,9 @@ var Glottis = {
       this.intensity += 0.13;
     else this.intensity -= AudioSystem.blockTime * 5;
     this.intensity = Math.clamp(this.intensity, 0, 1);
-  },
+  }
 
-  setupWaveform: function (lambda) {
+  setupWaveform(lambda) {
     this.frequency =
       this.oldFrequency * (1 - lambda) + this.newFrequency * lambda;
     var tenseness =
@@ -727,7 +880,7 @@ var Glottis = {
     var Rd = this.Rd;
     if (Rd < 0.5) Rd = 0.5;
     if (Rd > 2.7) Rd = 2.7;
-    var output;
+
     // normalized to time = 1, Ee = 1
     var Ra = -0.01 + 0.048 * Rd;
     var Rk = 0.224 + 0.118 * Rd;
@@ -769,45 +922,79 @@ var Glottis = {
     this.Delta = Delta;
     this.Te = Te;
     this.omega = omega;
-  },
+  }
 
-  normalizedLFWaveform: function (t) {
+  normalizedLFWaveform(t) {
+    let output;
     if (t > this.Te)
       output =
         (-Math.exp(-this.epsilon * (t - this.Te)) + this.shift) / this.Delta;
     else output = this.E0 * Math.exp(this.alpha * t) * Math.sin(this.omega * t);
 
     return output * this.intensity * this.loudness;
-  },
-};
+  }
+}
 
-var Tract = {
-  n: 44,
-  bladeStart: 10,
-  tipStart: 32,
-  lipStart: 39,
-  R: [], //component going right
-  L: [], //component going left
-  reflection: [],
-  junctionOutputR: [],
-  junctionOutputL: [],
-  maxAmplitude: [],
-  diameter: [],
-  restDiameter: [],
-  targetDiameter: [],
-  newDiameter: [],
-  A: [],
-  glottalReflection: 0.75,
-  lipReflection: -0.85,
-  lastObstruction: -1,
-  fade: 1.0, //0.9999,
-  movementSpeed: 15, //cm per second
-  transients: [],
-  lipOutput: 0,
-  noseOutput: 0,
-  velumTarget: 0.01,
+let Glottis: GlottisClass;
 
-  init: function () {
+class TractClass {
+  lipOutput: any;
+  noseOutput: any;
+  n: number;
+  bladeStart: number;
+  tipStart: number;
+  lipStart: number;
+  R: Float64Array;
+  L: Float64Array;
+  reflection: Float64Array;
+  junctionOutputR: Float64Array;
+  junctionOutputL: Float64Array;
+  maxAmplitude: Float64Array;
+  diameter: Float64Array;
+  restDiameter: Float64Array;
+  targetDiameter: Float64Array;
+  newDiameter: Float64Array;
+  A: Float64Array;
+  glottalReflection: number;
+  lipReflection: number;
+  lastObstruction: number;
+  fade: number;
+  movementSpeed: number;
+  transients: Transient[];
+  velumTarget: number;
+  newReflection: Float64Array;
+  noseLength: number;
+  noseStart: number;
+  noseR: Float64Array;
+  noseL: Float64Array;
+  noseJunctionOutputR: Float64Array;
+  noseJunctionOutputL: Float64Array;
+  noseReflection: Float64Array;
+  noseDiameter: Float64Array;
+  noseA: Float64Array;
+  noseMaxAmplitude: Float64Array;
+  newReflectionLeft: number;
+  newReflectionRight: number;
+  newReflectionNose: number;
+  reflectionLeft: any;
+  reflectionRight: any;
+  reflectionNose: any;
+
+  constructor() {
+    this.n = 44;
+    this.bladeStart = 10;
+    this.tipStart = 32;
+    this.lipStart = 39;
+    this.glottalReflection = 0.75;
+    this.lipReflection = -0.85;
+    this.lastObstruction = -1;
+    this.fade = 1.0; //0.9999
+    this.movementSpeed = 15; //cm per secon
+    this.transients = [];
+    this.lipOutput = 0;
+    this.noseOutput = 0;
+    this.velumTarget = 0.01;
+
     this.bladeStart = Math.floor((this.bladeStart * this.n) / 44);
     this.tipStart = Math.floor((this.tipStart * this.n) / 44);
     this.lipStart = Math.floor((this.lipStart * this.n) / 44);
@@ -846,7 +1033,7 @@ var Tract = {
     this.noseA = new Float64Array(this.noseLength);
     this.noseMaxAmplitude = new Float64Array(this.noseLength);
     for (var i = 0; i < this.noseLength; i++) {
-      var diameter;
+      let diameter: number;
       var d = 2 * (i / this.noseLength);
       if (d < 1) diameter = 0.4 + 1.6 * d;
       else diameter = 0.5 + 1.5 * (2 - d);
@@ -860,9 +1047,9 @@ var Tract = {
     this.calculateReflections();
     this.calculateNoseReflections();
     this.noseDiameter[0] = this.velumTarget;
-  },
+  }
 
-  reshapeTract: function (deltaTime) {
+  reshapeTract(deltaTime) {
     var amount = deltaTime * this.movementSpeed;
     var newLastObstruction = -1;
     for (var i = 0; i < this.n; i++) {
@@ -899,9 +1086,9 @@ var Tract = {
       amount * 0.1
     );
     this.noseA[0] = this.noseDiameter[0] * this.noseDiameter[0];
-  },
+  }
 
-  calculateReflections: function () {
+  calculateReflections() {
     for (var i = 0; i < this.n; i++) {
       this.A[i] = this.diameter[i] * this.diameter[i]; //ignoring PI etc.
     }
@@ -924,9 +1111,9 @@ var Tract = {
     this.newReflectionLeft = (2 * this.A[this.noseStart] - sum) / sum;
     this.newReflectionRight = (2 * this.A[this.noseStart + 1] - sum) / sum;
     this.newReflectionNose = (2 * this.noseA[0] - sum) / sum;
-  },
+  }
 
-  calculateNoseReflections: function () {
+  calculateNoseReflections() {
     for (var i = 0; i < this.noseLength; i++) {
       this.noseA[i] = this.noseDiameter[i] * this.noseDiameter[i];
     }
@@ -935,9 +1122,9 @@ var Tract = {
         (this.noseA[i - 1] - this.noseA[i]) /
         (this.noseA[i - 1] + this.noseA[i]);
     }
-  },
+  }
 
-  runStep: function (glottalOutput, turbulenceNoise, lambda) {
+  runStep(glottalOutput: number, turbulenceNoise, lambda) {
     var updateAmplitudes = Math.random() < 0.1;
 
     //mouth
@@ -1016,24 +1203,25 @@ var Tract = {
     }
 
     this.noseOutput = this.noseR[this.noseLength - 1];
-  },
+  }
 
-  finishBlock: function () {
+  finishBlock() {
     this.reshapeTract(AudioSystem.blockTime);
     this.calculateReflections();
-  },
+  }
 
-  addTransient: function (position) {
-    var trans = {};
-    trans.position = position;
-    trans.timeAlive = 0;
-    trans.lifeTime = 0.2;
-    trans.strength = 0.3;
-    trans.exponent = 200;
+  addTransient(position) {
+    var trans: Transient = {
+      position: position,
+      timeAlive: 0,
+      lifeTime: 0.2,
+      strength: 0.3,
+      exponent: 200,
+    };
     this.transients.push(trans);
-  },
+  }
 
-  processTransients: function () {
+  processTransients() {
     for (var i = 0; i < this.transients.length; i++) {
       var trans = this.transients[i];
       var amplitude =
@@ -1048,9 +1236,9 @@ var Tract = {
         this.transients.splice(i, 1);
       }
     }
-  },
+  }
 
-  addTurbulenceNoise: function (turbulenceNoise) {
+  addTurbulenceNoise(turbulenceNoise) {
     for (var j = 0; j < UI.touchesWithMouse.length; j++) {
       var touch = UI.touchesWithMouse[j];
       if (touch.index < 2 || touch.index > Tract.n) continue;
@@ -1063,9 +1251,9 @@ var Tract = {
         touch.diameter
       );
     }
-  },
+  }
 
-  addTurbulenceNoiseAtIndex: function (turbulenceNoise, index, diameter) {
+  addTurbulenceNoiseAtIndex(turbulenceNoise, index, diameter) {
     var i = Math.floor(index);
     var delta = index - i;
     turbulenceNoise *= Glottis.getNoiseModulator();
@@ -1077,27 +1265,48 @@ var Tract = {
     this.L[i + 1] += noise0 / 2;
     this.R[i + 2] += noise1 / 2;
     this.L[i + 2] += noise1 / 2;
-  },
-};
+  }
+}
 
-var TractUI = {
-  originX: 340,
-  originY: 449,
-  radius: 298,
-  scale: 60,
-  tongueIndex: 12.9,
-  tongueDiameter: 2.43,
-  innerTongueControlRadius: 2.05,
-  outerTongueControlRadius: 3.5,
-  tongueTouch: 0,
-  angleScale: 0.64,
-  angleOffset: -0.24,
-  noseOffset: 0.8,
-  gridOffset: 1.7,
-  fillColour: "pink",
-  lineColour: "#C070C6",
+let Tract: TractClass;
 
-  init: function () {
+class TractUIClass {
+  originX: number;
+  originY: number;
+  radius: number;
+  scale: number;
+  tongueIndex: number;
+  tongueDiameter: number;
+  innerTongueControlRadius: number;
+  outerTongueControlRadius: number;
+  tongueTouch: TouchT | null;
+  angleScale: number;
+  angleOffset: number;
+  noseOffset: number;
+  gridOffset: number;
+  fillColour: string;
+  lineColour: string;
+  ctx: CanvasRenderingContext2D;
+  tongueLowerIndexBound: number;
+  tongueUpperIndexBound: number;
+  tongueIndexCentre: number;
+  constructor() {
+    this.originX = 340;
+    this.originY = 449;
+    this.radius = 298;
+    this.scale = 60;
+    this.tongueIndex = 12.9;
+    this.tongueDiameter = 2.43;
+    this.innerTongueControlRadius = 2.05;
+    this.outerTongueControlRadius = 3.5;
+    this.tongueTouch = null;
+    this.angleScale = 0.64;
+    this.angleOffset = -0.24;
+    this.noseOffset = 0.8;
+    this.gridOffset = 1.7;
+    this.fillColour = "pink";
+    this.lineColour = "#C070C6";
+
     this.ctx = tractCtx;
     this.setRestDiameter();
     for (var i = 0; i < Tract.n; i++) {
@@ -1108,9 +1317,9 @@ var TractUI = {
     this.tongueUpperIndexBound = Tract.tipStart - 3;
     this.tongueIndexCentre =
       0.5 * (this.tongueLowerIndexBound + this.tongueUpperIndexBound);
-  },
+  }
 
-  moveTo: function (i, d) {
+  moveTo(i, d) {
     var angle =
       this.angleOffset + (i * this.angleScale * Math.PI) / (Tract.lipStart - 1);
     var wobble =
@@ -1123,9 +1332,9 @@ var TractUI = {
       this.originX - r * Math.cos(angle),
       this.originY - r * Math.sin(angle)
     );
-  },
+  }
 
-  lineTo: function (i, d) {
+  lineTo(i, d) {
     var angle =
       this.angleOffset + (i * this.angleScale * Math.PI) / (Tract.lipStart - 1);
     var wobble =
@@ -1138,9 +1347,9 @@ var TractUI = {
       this.originX - r * Math.cos(angle),
       this.originY - r * Math.sin(angle)
     );
-  },
+  }
 
-  drawText: function (i, d, text) {
+  drawText(i, d, text) {
     var angle =
       this.angleOffset + (i * this.angleScale * Math.PI) / (Tract.lipStart - 1);
     var r = this.radius - this.scale * d;
@@ -1152,9 +1361,9 @@ var TractUI = {
     this.ctx.rotate(angle - Math.PI / 2);
     this.ctx.fillText(text, 0, 0);
     this.ctx.restore();
-  },
+  }
 
-  drawTextStraight: function (i, d, text) {
+  drawTextStraight(i, d, text) {
     var angle =
       this.angleOffset + (i * this.angleScale * Math.PI) / (Tract.lipStart - 1);
     var r = this.radius - this.scale * d;
@@ -1166,9 +1375,9 @@ var TractUI = {
     //this.ctx.rotate(angle-Math.PI/2);
     this.ctx.fillText(text, 0, 0);
     this.ctx.restore();
-  },
+  }
 
-  drawCircle: function (i, d, radius) {
+  drawCircle(i, d, radius) {
     var angle =
       this.angleOffset + (i * this.angleScale * Math.PI) / (Tract.lipStart - 1);
     var r = this.radius - this.scale * d;
@@ -1181,9 +1390,9 @@ var TractUI = {
       2 * Math.PI
     );
     this.ctx.fill();
-  },
+  }
 
-  getIndex: function (x, y) {
+  getIndex(x, y) {
     var xx = x - this.originX;
     var yy = y - this.originY;
     var angle = Math.atan2(yy, xx);
@@ -1192,14 +1401,14 @@ var TractUI = {
       ((Math.PI + angle - this.angleOffset) * (Tract.lipStart - 1)) /
       (this.angleScale * Math.PI)
     );
-  },
-  getDiameter: function (x, y) {
+  }
+  getDiameter(x, y) {
     var xx = x - this.originX;
     var yy = y - this.originY;
     return (this.radius - Math.sqrt(xx * xx + yy * yy)) / this.scale;
-  },
+  }
 
-  draw: function () {
+  draw() {
     this.ctx.clearRect(0, 0, tractCanvas.width, tractCanvas.height);
     this.ctx.lineCap = "round";
     this.ctx.lineJoin = "round";
@@ -1319,9 +1528,9 @@ var TractUI = {
     this.ctx.textAlign = "left";
     this.ctx.fillText(UI.debugText, 20, 20);
     //this.drawPositions();
-  },
+  }
 
-  drawBackground: function () {
+  drawBackground() {
     this.ctx = backCtx;
 
     //text
@@ -1371,9 +1580,9 @@ var TractUI = {
     this.ctx.globalAlpha = 0.9;
     this.ctx.globalAlpha = 1.0;
     this.ctx = tractCtx;
-  },
+  }
 
-  drawPositions: function () {
+  drawPositions() {
     this.ctx.fillStyle = "orchid";
     this.ctx.font = "bold 24px Quicksand";
     this.ctx.textAlign = "center";
@@ -1428,9 +1637,9 @@ var TractUI = {
       this.drawText(36, nasals, "n");
       this.drawText(41, nasals, "m");
     }
-  },
+  }
 
-  drawAmplitudes: function () {
+  drawAmplitudes() {
     this.ctx.strokeStyle = "orchid";
     this.ctx.lineCap = "butt";
     this.ctx.globalAlpha = 0.3;
@@ -1458,9 +1667,9 @@ var TractUI = {
       }
     }
     this.ctx.globalAlpha = 1;
-  },
+  }
 
-  drawTongueControl: function () {
+  drawTongueControl() {
     this.ctx.lineCap = "round";
     this.ctx.lineJoin = "round";
     this.ctx.strokeStyle = palePink;
@@ -1518,9 +1727,9 @@ var TractUI = {
     this.ctx.globalAlpha = 1.0;
 
     this.ctx.fillStyle = "orchid";
-  },
+  }
 
-  drawPitchControl: function () {
+  drawPitchControl() {
     var w = 9;
     var h = 15;
     if (Glottis.x) {
@@ -1538,9 +1747,9 @@ var TractUI = {
       this.ctx.fill();
       this.ctx.globalAlpha = 1.0;
     }
-  },
+  }
 
-  setRestDiameter: function () {
+  setRestDiameter() {
     for (var i = Tract.bladeStart; i < Tract.lipStart; i++) {
       var t =
         (1.1 * Math.PI * (this.tongueIndex - i)) /
@@ -1551,12 +1760,13 @@ var TractUI = {
       if (i == Tract.bladeStart || i == Tract.lipStart - 2) curve *= 0.94;
       Tract.restDiameter[i] = 1.5 - curve;
     }
-  },
+  }
 
-  handleTouches: function () {
-    if (this.tongueTouch != 0 && !this.tongueTouch.alive) this.tongueTouch = 0;
+  handleTouches() {
+    if (this.tongueTouch != null && !this.tongueTouch.alive)
+      this.tongueTouch = null;
 
-    if (this.tongueTouch == 0) {
+    if (this.tongueTouch == null) {
       for (var j = 0; j < UI.touchesWithMouse.length; j++) {
         var touch = UI.touchesWithMouse[j];
         if (!touch.alive) continue;
@@ -1576,7 +1786,7 @@ var TractUI = {
       }
     }
 
-    if (this.tongueTouch != 0) {
+    if (this.tongueTouch != null) {
       var x = this.tongueTouch.x;
       var y = this.tongueTouch.y;
       var index = TractUI.getIndex(x, y);
@@ -1635,7 +1845,7 @@ var TractUI = {
         y < tractCanvas.height &&
         diameter < 3
       ) {
-        intIndex = Math.round(index);
+        let intIndex = Math.round(index);
         for (var i = -Math.ceil(width) - 1; i < width + 1; i++) {
           if (intIndex + i < 0 || intIndex + i >= Tract.n) continue;
           var relpos = intIndex + i - index;
@@ -1652,8 +1862,10 @@ var TractUI = {
         }
       }
     }
-  },
-};
+  }
+}
+
+let TractUI: TractUIClass;
 
 function nullButton(switchedOn) {
   return {
@@ -1669,75 +1881,14 @@ function nullButton(switchedOn) {
   };
 }
 
-function makeButton(x, y, width, height, text, switchedOn) {
-  button = {};
-  button.x = x;
-  button.y = y;
-  button.width = width;
-  button.height = height;
-  button.text = text;
-  button.switchedOn = switchedOn;
-
-  button.draw = function (ctx) {
-    var radius = 10;
-    ctx.strokeStyle = palePink;
-    ctx.fillStyle = palePink;
-    ctx.globalAlpha = 1.0;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    ctx.lineWidth = 2 * radius;
-
-    ctx.beginPath();
-    ctx.moveTo(this.x + radius, this.y + radius);
-    ctx.lineTo(this.x + this.width - radius, this.y + radius);
-    ctx.lineTo(this.x + this.width - radius, this.y + this.height - radius);
-    ctx.lineTo(this.x + radius, this.y + this.height - radius);
-    ctx.closePath();
-    ctx.stroke();
-    ctx.fill();
-
-    ctx.font = "bold 16px Quicksand";
-    ctx.textAlign = "center";
-    if (this.switchedOn) {
-      ctx.fillStyle = "orchid";
-      ctx.globalAlpha = 0.6;
-    } else {
-      ctx.fillStyle = "white";
-      ctx.globalAlpha = 1.0;
-    }
-    this.drawText(ctx);
-  };
-
-  button.drawText = function (ctx) {
-    ctx.fillText(
-      this.text,
-      this.x + this.width / 2,
-      this.y + this.height / 2 + 6
-    );
-  };
-
-  button.handleTouchStart = function (touch) {
-    if (
-      touch.x >= this.x &&
-      touch.x <= this.x + this.width &&
-      touch.y >= this.y &&
-      touch.y <= this.y + this.height
-    ) {
-      this.switchedOn = !this.switchedOn;
-    }
-  };
-
-  return button;
-}
-
 function start() {
   document.body.style.cursor = "pointer";
 
-  AudioSystem.init();
-  UI.init();
-  Glottis.init();
-  Tract.init();
-  TractUI.init();
+  AudioSystem = new AudioSystemClass();
+  UI = new UIClass();
+  Glottis = new GlottisClass();
+  Tract = new TractClass();
+  TractUI = new TractUIClass();
 
   requestAnimationFrame(redraw);
   function redraw(highResTimestamp) {
@@ -1788,8 +1939,24 @@ function addLanguageSwitcher() {
  *
  */
 
+var noise: {
+  seed: (seed: any) => void;
+  simplex2: (xin: any, yin: any) => number;
+  simplex1: (x: number) => number;
+} = {
+  simplex1: function (x: number): number {
+    throw new Error("Function not implemented.");
+  },
+  seed: function (seed: any): void {
+    throw new Error("Function not implemented.");
+  },
+  simplex2: function (xin: any, yin: any): number {
+    throw new Error("Function not implemented.");
+  },
+};
+
 (function (global) {
-  var module = (global.noise = {});
+  var module = noise;
 
   function Grad(x, y, z) {
     this.x = x;
@@ -1956,12 +2123,12 @@ IMAGINARY.i18n
     translationsDirectory: "tr",
     defaultLanguage: "en",
   })
-  .then(function () {
-    return Promise.all([
-      new FontFaceObserver("Quicksand", { weight: 400 }).load(),
-      new FontFaceObserver("Quicksand", { weight: 700 }).load(),
-    ]);
-  })
+  // .then(function () {
+  //   return Promise.all([
+  //     new FontFaceObserver("Quicksand", { weight: 400 }).load(),
+  //     new FontFaceObserver("Quicksand", { weight: 700 }).load(),
+  //   ]);
+  // })
   .then(function () {
     start();
     addLanguageSwitcher();
