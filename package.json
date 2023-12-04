@@ -1,0 +1,24 @@
+{
+  "name": "pink-trombone",
+  "version": "1.0.0",
+  "description": "Pink Trombone exhibit by [Neil Thapen](http://venuspatrol.nfshost.com/) Bare-handed procedural speech synthesis. [Original version](https://dood.al/pinktrombone/)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "http-server -p 8000"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IMAGINARY/pink-trombone.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/IMAGINARY/pink-trombone/issues"
+  },
+  "homepage": "https://github.com/IMAGINARY/pink-trombone#readme",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
