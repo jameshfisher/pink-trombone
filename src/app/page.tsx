@@ -39,6 +39,7 @@ export default function Home() {
           backgroundColor: "transparent",
           margin: 0,
           padding: 0,
+          mixBlendMode: "darken",
         }}
       ></canvas>
       <canvas
