@@ -1,8 +1,9 @@
 # pink-trombone
 
-Pink Trombone exhibit by [Neil Thapen](http://venuspatrol.nfshost.com/)
 Bare-handed procedural speech synthesis.
-[Original version](https://dood.al/pinktrombone/)
+
+* Version 1.1, March 2017 by [Neil Thapen](http://venuspatrol.nfshost.com/)
+* [Original version](https://dood.al/pinktrombone/)
 
 ## Bibliography (provided by author)
 
@@ -39,4 +40,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
-
