@@ -11,6 +11,7 @@ import {
   palePink,
   TractUI,
   temp,
+  CANVAS_SCALE,
 } from "./globals";
 
 export class TractUIClass {
@@ -73,8 +74,8 @@ export class TractUIClass {
     angle += wobble;
     var r = this.radius - this.scale * d + 100 * wobble;
     this.ctx.moveTo(
-      this.originX - r * Math.cos(angle),
-      this.originY - r * Math.sin(angle)
+      CANVAS_SCALE * (this.originX - r * Math.cos(angle)),
+      CANVAS_SCALE * (this.originY - r * Math.sin(angle))
     );
   }
 
@@ -88,8 +89,8 @@ export class TractUIClass {
     angle += wobble;
     var r = this.radius - this.scale * d + 100 * wobble;
     this.ctx.lineTo(
-      this.originX - r * Math.cos(angle),
-      this.originY - r * Math.sin(angle)
+      CANVAS_SCALE * (this.originX - r * Math.cos(angle)),
+      CANVAS_SCALE * (this.originY - r * Math.sin(angle))
     );
   }
 
@@ -99,8 +100,8 @@ export class TractUIClass {
     var r = this.radius - this.scale * d;
     this.ctx.save();
     this.ctx.translate(
-      this.originX - r * Math.cos(angle),
-      this.originY - r * Math.sin(angle) + 2
+      CANVAS_SCALE * (this.originX - r * Math.cos(angle)),
+      CANVAS_SCALE * (this.originY - r * Math.sin(angle) + 2)
     ); //+8);
     this.ctx.rotate(angle - Math.PI / 2);
     this.ctx.fillText(text, 0, 0);
@@ -113,8 +114,8 @@ export class TractUIClass {
     var r = this.radius - this.scale * d;
     this.ctx.save();
     this.ctx.translate(
-      this.originX - r * Math.cos(angle),
-      this.originY - r * Math.sin(angle) + 2
+      CANVAS_SCALE * (this.originX - r * Math.cos(angle)),
+      CANVAS_SCALE * (this.originY - r * Math.sin(angle) + 2)
     ); //+8);
     //this.ctx.rotate(angle-Math.PI/2);
     this.ctx.fillText(text, 0, 0);
@@ -127,9 +128,9 @@ export class TractUIClass {
     var r = this.radius - this.scale * d;
     this.ctx.beginPath();
     this.ctx.arc(
-      this.originX - r * Math.cos(angle),
-      this.originY - r * Math.sin(angle),
-      radius,
+      CANVAS_SCALE * (this.originX - r * Math.cos(angle)),
+      CANVAS_SCALE * (this.originY - r * Math.sin(angle)),
+      CANVAS_SCALE * radius,
       0,
       2 * Math.PI
     );
@@ -153,7 +154,12 @@ export class TractUIClass {
   }
 
   draw() {
-    this.ctx.clearRect(0, 0, tractCanvas.width, tractCanvas.height);
+    this.ctx.clearRect(
+      0,
+      0,
+      CANVAS_SCALE * tractCanvas.width,
+      CANVAS_SCALE * tractCanvas.height
+    );
     this.ctx.lineCap = "round";
     this.ctx.lineJoin = "round";
 
@@ -165,7 +171,7 @@ export class TractUIClass {
 
     //first draw fill
     this.ctx.beginPath();
-    this.ctx.lineWidth = 2;
+    this.ctx.lineWidth = CANVAS_SCALE * 2;
     this.ctx.strokeStyle = this.fillColour;
     this.ctx.fillStyle = this.fillColour;
     this.moveTo(1, 0);
@@ -177,7 +183,7 @@ export class TractUIClass {
 
     //for nose
     this.ctx.beginPath();
-    this.ctx.lineWidth = 2;
+    this.ctx.lineWidth = CANVAS_SCALE * 2;
     this.ctx.strokeStyle = this.fillColour;
     this.ctx.fillStyle = this.fillColour;
     this.moveTo(Tract.noseStart, -this.noseOffset);
@@ -194,7 +200,7 @@ export class TractUIClass {
 
     //velum
     this.ctx.beginPath();
-    this.ctx.lineWidth = 2;
+    this.ctx.lineWidth = CANVAS_SCALE * 2;
     this.ctx.strokeStyle = this.fillColour;
     this.ctx.fillStyle = this.fillColour;
     this.moveTo(Tract.noseStart - 2, 0);
@@ -207,19 +213,19 @@ export class TractUIClass {
 
     //white text
     this.ctx.fillStyle = "white";
-    this.ctx.font = "bold 20px Quicksand";
+    this.ctx.font = "bold 40px Quicksand";
     this.ctx.textAlign = "center";
     this.ctx.globalAlpha = 1.0;
     this.drawText(Tract.n * 0.1, 0.425, IMAGINARY.i18n.t("THROAT"));
     this.drawText(Tract.n * 0.7, -1.5, IMAGINARY.i18n.t("NASAL_CAVITY"));
-    this.ctx.font = "bold 20px Quicksand";
+    this.ctx.font = "bold 40px Quicksand";
     this.drawText(Tract.n * 0.7, 0.9, IMAGINARY.i18n.t("ORAL_CAVITY"));
 
     this.drawAmplitudes();
 
     //then draw lines
     this.ctx.beginPath();
-    this.ctx.lineWidth = 5;
+    this.ctx.lineWidth = CANVAS_SCALE * 5;
     this.ctx.strokeStyle = this.lineColour;
     this.ctx.lineJoin = "round";
     this.ctx.lineCap = "round";
@@ -234,7 +240,7 @@ export class TractUIClass {
 
     //for nose
     this.ctx.beginPath();
-    this.ctx.lineWidth = 5;
+    this.ctx.lineWidth = CANVAS_SCALE * 5;
     this.ctx.strokeStyle = this.lineColour;
     this.ctx.lineJoin = "round";
     this.moveTo(Tract.noseStart, -this.noseOffset);
@@ -258,7 +264,7 @@ export class TractUIClass {
     this.ctx.stroke();
 
     this.ctx.fillStyle = "orchid";
-    this.ctx.font = "bold 14px Quicksand";
+    this.ctx.font = "bold 28px Quicksand";
     this.ctx.textAlign = "center";
     this.ctx.globalAlpha = 0.7;
     this.drawText(
@@ -270,7 +276,7 @@ export class TractUIClass {
     this.ctx.globalAlpha = 1.0;
     this.ctx.fillStyle = "black";
     this.ctx.textAlign = "left";
-    this.ctx.fillText(UI.debugText, 20, 20);
+    this.ctx.fillText(UI.debugText, CANVAS_SCALE * 20, CANVAS_SCALE * 20);
     //this.drawPositions();
   }
 
@@ -279,7 +285,7 @@ export class TractUIClass {
 
     //text
     this.ctx.fillStyle = "orchid";
-    this.ctx.font = "bold 14px Quicksand";
+    this.ctx.font = "bold 28px Quicksand";
     this.ctx.textAlign = "center";
     this.ctx.globalAlpha = 0.7;
     this.drawText(Tract.n * 0.44, -0.28, IMAGINARY.i18n.t("SOFT_PALATE_1"));
@@ -302,7 +308,7 @@ export class TractUIClass {
     );
     this.drawText(Tract.n * 0.95, -0.28, " " + IMAGINARY.i18n.t("LIP"));
 
-    this.ctx.font = "bold 14px Quicksand";
+    this.ctx.font = "bold 28px Quicksand";
     this.drawTextStraight(
       Tract.n * 0.18,
       3,
@@ -314,7 +320,7 @@ export class TractUIClass {
     this.drawText(Tract.n * 1.01, 0.51, IMAGINARY.i18n.t("FRICATIVES"));
     //this.drawTextStraight(1.5, +0.8, "glottis")
     this.ctx.strokeStyle = "orchid";
-    this.ctx.lineWidth = 2;
+    this.ctx.lineWidth = CANVAS_SCALE * 2;
     this.ctx.beginPath();
     this.moveTo(Tract.n * 1.01, 0);
     this.lineTo(Tract.n * 1.04, 0);
@@ -328,7 +334,7 @@ export class TractUIClass {
 
   drawPositions() {
     this.ctx.fillStyle = "orchid";
-    this.ctx.font = "bold 24px Quicksand";
+    this.ctx.font = "bold 48px Quicksand";
     this.ctx.textAlign = "center";
     this.ctx.globalAlpha = 0.6;
     var a = 2;
@@ -391,7 +397,7 @@ export class TractUIClass {
       var lineWidth = Math.sqrt(Tract.maxAmplitude[i]) * 3;
       if (lineWidth > 0) {
         this.ctx.beginPath();
-        this.ctx.lineWidth = lineWidth;
+        this.ctx.lineWidth = CANVAS_SCALE * lineWidth;
         this.moveTo(i, 0);
         this.lineTo(i, Tract.diameter[i]);
         this.ctx.stroke();
@@ -401,7 +407,7 @@ export class TractUIClass {
       var lineWidth = Math.sqrt(Tract.noseMaxAmplitude[i]) * 3;
       if (lineWidth > 0) {
         this.ctx.beginPath();
-        this.ctx.lineWidth = lineWidth;
+        this.ctx.lineWidth = CANVAS_SCALE * lineWidth;
         this.moveTo(i + Tract.noseStart, -this.noseOffset);
         this.lineTo(
           i + Tract.noseStart,
@@ -420,7 +426,7 @@ export class TractUIClass {
     this.ctx.fillStyle = palePink;
     this.ctx.globalAlpha = 1.0;
     this.ctx.beginPath();
-    this.ctx.lineWidth = 45;
+    this.ctx.lineWidth = CANVAS_SCALE * 45;
 
     //outline
     this.moveTo(this.tongueLowerIndexBound, this.innerTongueControlRadius);
@@ -460,11 +466,17 @@ export class TractUIClass {
     var r = this.radius - this.scale * this.tongueDiameter;
     var x = this.originX - r * Math.cos(angle);
     var y = this.originY - r * Math.sin(angle);
-    this.ctx.lineWidth = 4;
+    this.ctx.lineWidth = CANVAS_SCALE * 4;
     this.ctx.strokeStyle = "orchid";
     this.ctx.globalAlpha = 0.7;
     this.ctx.beginPath();
-    this.ctx.arc(x, y, 18, 0, 2 * Math.PI);
+    this.ctx.arc(
+      CANVAS_SCALE * x,
+      CANVAS_SCALE * y,
+      CANVAS_SCALE * 18,
+      0,
+      2 * Math.PI
+    );
     this.ctx.stroke();
     this.ctx.globalAlpha = 0.15;
     this.ctx.fill();
@@ -477,14 +489,26 @@ export class TractUIClass {
     var w = 9;
     var h = 15;
     if (Glottis.x) {
-      this.ctx.lineWidth = 4;
+      this.ctx.lineWidth = CANVAS_SCALE * 4;
       this.ctx.strokeStyle = "orchid";
       this.ctx.globalAlpha = 0.7;
       this.ctx.beginPath();
-      this.ctx.moveTo(Glottis.x - w, Glottis.y - h);
-      this.ctx.lineTo(Glottis.x + w, Glottis.y - h);
-      this.ctx.lineTo(Glottis.x + w, Glottis.y + h);
-      this.ctx.lineTo(Glottis.x - w, Glottis.y + h);
+      this.ctx.moveTo(
+        CANVAS_SCALE * (Glottis.x - w),
+        CANVAS_SCALE * (Glottis.y - h)
+      );
+      this.ctx.lineTo(
+        CANVAS_SCALE * (Glottis.x + w),
+        CANVAS_SCALE * (Glottis.y - h)
+      );
+      this.ctx.lineTo(
+        CANVAS_SCALE * (Glottis.x + w),
+        CANVAS_SCALE * (Glottis.y + h)
+      );
+      this.ctx.lineTo(
+        CANVAS_SCALE * (Glottis.x - w),
+        CANVAS_SCALE * (Glottis.y + h)
+      );
       this.ctx.closePath();
       this.ctx.stroke();
       this.ctx.globalAlpha = 0.15;

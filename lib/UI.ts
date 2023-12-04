@@ -1,6 +1,7 @@
 import { nullButton } from "./Button";
 import {
   AudioSystem,
+  CANVAS_SCALE,
   Glottis,
   TractUI,
   UI,
@@ -89,7 +90,7 @@ export class UIClass {
     var ctx = tractCtx;
     ctx.globalAlpha = 0.8;
     ctx.fillStyle = "white";
-    ctx.rect(0, 0, 600, 600);
+    ctx.rect(0, 0, CANVAS_SCALE * 600, CANVAS_SCALE * 600);
     ctx.fill();
 
     this.drawAboutText();
@@ -100,24 +101,36 @@ export class UIClass {
     ctx.globalAlpha = 1.0;
     ctx.fillStyle = "#C070C6";
     ctx.strokeStyle = "#C070C6";
-    ctx.font = "50px Quicksand";
-    ctx.lineWidth = 3;
+    ctx.font = "100px Quicksand";
+    ctx.lineWidth = CANVAS_SCALE * 3;
     ctx.textAlign = "center";
-    ctx.strokeText("P i n k   T r o m b o n e", 300, 230);
-    ctx.fillText("P i n k   T r o m b o n e", 300, 230);
+    ctx.strokeText(
+      "P i n k   T r o m b o n e",
+      CANVAS_SCALE * 300,
+      CANVAS_SCALE * 230
+    );
+    ctx.fillText(
+      "P i n k   T r o m b o n e",
+      CANVAS_SCALE * 300,
+      CANVAS_SCALE * 230
+    );
 
-    ctx.font = "28px Quicksand";
-    ctx.fillText("bare-handed  speech synthesis", 300, 330);
+    ctx.font = "56px Quicksand";
+    ctx.fillText(
+      "bare-handed  speech synthesis",
+      CANVAS_SCALE * 300,
+      CANVAS_SCALE * 330
+    );
 
-    ctx.font = "20px Quicksand";
+    ctx.font = "40px Quicksand";
     //ctx.fillText("(tap to start)", 300, 380);
 
     if (isFirefox) {
-      ctx.font = "20px Quicksand";
+      ctx.font = "40px Quicksand";
       ctx.fillText(
         "(sorry - may work poorly with the Firefox browser)",
-        300,
-        430
+        CANVAS_SCALE * 300,
+        CANVAS_SCALE * 430
       );
     }
   }
@@ -133,11 +146,11 @@ export class UIClass {
     ctx.globalAlpha = 1.0;
     ctx.fillStyle = "#C070C6";
     ctx.strokeStyle = "#C070C6";
-    ctx.font = "24px Quicksand";
-    ctx.lineWidth = 2;
+    ctx.font = "48px Quicksand";
+    ctx.lineWidth = CANVAS_SCALE * 2;
     ctx.textAlign = "center";
 
-    ctx.font = "19px Quicksand";
+    ctx.font = "38px Quicksand";
     ctx.textAlign = "left";
     this.instructionsLine = 0;
     this.write("Sound is generated in the glottis (at the bottom left) then ");
@@ -193,7 +206,11 @@ export class UIClass {
   }
 
   write(text: string) {
-    tractCtx.fillText(text, 50, 100 + this.instructionsLine * 22);
+    tractCtx.fillText(
+      text,
+      CANVAS_SCALE * 50,
+      CANVAS_SCALE * (100 + this.instructionsLine * 22)
+    );
     this.instructionsLine += 1;
     if (text == "") this.instructionsLine -= 0.3;
   }

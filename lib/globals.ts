@@ -26,6 +26,8 @@ export let backCtx: CanvasRenderingContext2D;
 export let tractCanvas: HTMLCanvasElement;
 export let tractCtx: CanvasRenderingContext2D;
 
+export const CANVAS_SCALE = 2; // Early Pink Trombone is hard-coded to low res
+
 // Export setters for the global variables
 export function setSampleRate(value: number) {
   sampleRate = value;

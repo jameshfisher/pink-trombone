@@ -31,8 +31,8 @@ export default function Home() {
       <canvas
         ref={tractCanvasRef}
         id="tractCanvas"
-        width="600"
-        height="600"
+        width="1200"
+        height="1200"
         style={{
           position: "absolute",
           zIndex: 2,
@@ -44,8 +44,8 @@ export default function Home() {
       <canvas
         ref={backCanvasRef}
         id="backCanvas"
-        width="600"
-        height="600"
+        width="1200"
+        height="1200"
         style={{
           position: "absolute",
           zIndex: 0,

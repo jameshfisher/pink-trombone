@@ -9,6 +9,7 @@ import {
   Glottis,
   UI,
   backCtx,
+  CANVAS_SCALE,
 } from "./globals";
 
 export class GlottisClass {
@@ -111,39 +112,56 @@ export class GlottisClass {
       var x = this.keyboardLeft + (i + 1 / 2) * keyWidth;
       var y = this.keyboardTop;
       if (this.marks[(i + 3) % 12] == 1) {
-        backCtx.lineWidth = 4;
+        backCtx.lineWidth = CANVAS_SCALE * 4;
         backCtx.globalAlpha = 0.4;
       } else {
-        backCtx.lineWidth = 3;
+        backCtx.lineWidth = CANVAS_SCALE * 3;
         backCtx.globalAlpha = 0.2;
       }
       backCtx.beginPath();
-      backCtx.moveTo(x, y + 9);
-      backCtx.lineTo(x, y + this.keyboardHeight * 0.4 - 9);
+      backCtx.moveTo(CANVAS_SCALE * x, CANVAS_SCALE * (y + 9));
+      backCtx.lineTo(
+        CANVAS_SCALE * x,
+        CANVAS_SCALE * (y + this.keyboardHeight * 0.4 - 9)
+      );
       backCtx.stroke();
 
-      backCtx.lineWidth = 3;
+      backCtx.lineWidth = CANVAS_SCALE * 3;
       backCtx.globalAlpha = 0.15;
 
       backCtx.beginPath();
-      backCtx.moveTo(x, y + this.keyboardHeight * 0.52 + 6);
-      backCtx.lineTo(x, y + this.keyboardHeight * 0.72 - 6);
+      backCtx.moveTo(
+        CANVAS_SCALE * x,
+        CANVAS_SCALE * (y + this.keyboardHeight * 0.52 + 6)
+      );
+      backCtx.lineTo(
+        CANVAS_SCALE * x,
+        CANVAS_SCALE * (y + this.keyboardHeight * 0.72 - 6)
+      );
       backCtx.stroke();
     }
 
     backCtx.fillStyle = "orchid";
-    backCtx.font = "bold 14px Quicksand";
+    backCtx.font = "bold 28px Quicksand";
     backCtx.textAlign = "center";
     backCtx.globalAlpha = 0.7;
-    backCtx.fillText(IMAGINARY.i18n.t("VOICEBOX_CONTROL"), 300, 490);
-    backCtx.fillText(IMAGINARY.i18n.t("PITCH"), 300, 592);
+    backCtx.fillText(
+      IMAGINARY.i18n.t("VOICEBOX_CONTROL"),
+      CANVAS_SCALE * 300,
+      CANVAS_SCALE * 490
+    );
+    backCtx.fillText(
+      IMAGINARY.i18n.t("PITCH"),
+      CANVAS_SCALE * 300,
+      CANVAS_SCALE * 592
+    );
     backCtx.globalAlpha = 0.3;
     backCtx.strokeStyle = "orchid";
     backCtx.fillStyle = "orchid";
     backCtx.save();
-    backCtx.translate(430, 587);
+    backCtx.translate(CANVAS_SCALE * 430, CANVAS_SCALE * 587);
     this.drawArrow(80, 2, 10);
-    backCtx.translate(-260, 0);
+    backCtx.translate(CANVAS_SCALE * -260, CANVAS_SCALE * 0);
     backCtx.rotate(Math.PI);
     this.drawArrow(80, 2, 10);
     backCtx.restore();
@@ -151,23 +169,27 @@ export class GlottisClass {
   }
 
   drawBar(topFactor: number, bottomFactor: number, radius: number) {
-    backCtx.lineWidth = radius * 2;
+    backCtx.lineWidth = CANVAS_SCALE * radius * 2;
     backCtx.beginPath();
     backCtx.moveTo(
-      this.keyboardLeft + radius,
-      this.keyboardTop + topFactor * this.keyboardHeight + radius
+      CANVAS_SCALE * (this.keyboardLeft + radius),
+      CANVAS_SCALE *
+        (this.keyboardTop + topFactor * this.keyboardHeight + radius)
     );
     backCtx.lineTo(
-      this.keyboardLeft + this.keyboardWidth - radius,
-      this.keyboardTop + topFactor * this.keyboardHeight + radius
+      CANVAS_SCALE * (this.keyboardLeft + this.keyboardWidth - radius),
+      CANVAS_SCALE *
+        (this.keyboardTop + topFactor * this.keyboardHeight + radius)
     );
     backCtx.lineTo(
-      this.keyboardLeft + this.keyboardWidth - radius,
-      this.keyboardTop + bottomFactor * this.keyboardHeight - radius
+      CANVAS_SCALE * (this.keyboardLeft + this.keyboardWidth - radius),
+      CANVAS_SCALE *
+        (this.keyboardTop + bottomFactor * this.keyboardHeight - radius)
     );
     backCtx.lineTo(
-      this.keyboardLeft + radius,
-      this.keyboardTop + bottomFactor * this.keyboardHeight - radius
+      CANVAS_SCALE * (this.keyboardLeft + radius),
+      CANVAS_SCALE *
+        (this.keyboardTop + bottomFactor * this.keyboardHeight - radius)
     );
     backCtx.closePath();
     backCtx.stroke();
@@ -175,14 +197,14 @@ export class GlottisClass {
   }
 
   drawArrow(l: number, ahw: number, ahl: number) {
-    backCtx.lineWidth = 2;
+    backCtx.lineWidth = CANVAS_SCALE * 2;
     backCtx.beginPath();
-    backCtx.moveTo(-l, 0);
-    backCtx.lineTo(0, 0);
-    backCtx.lineTo(0, -ahw);
-    backCtx.lineTo(ahl, 0);
-    backCtx.lineTo(0, ahw);
-    backCtx.lineTo(0, 0);
+    backCtx.moveTo(CANVAS_SCALE * -l, CANVAS_SCALE * 0);
+    backCtx.lineTo(CANVAS_SCALE * 0, CANVAS_SCALE * 0);
+    backCtx.lineTo(CANVAS_SCALE * 0, CANVAS_SCALE * -ahw);
+    backCtx.lineTo(CANVAS_SCALE * ahl, CANVAS_SCALE * 0);
+    backCtx.lineTo(CANVAS_SCALE * 0, CANVAS_SCALE * ahw);
+    backCtx.lineTo(CANVAS_SCALE * 0, CANVAS_SCALE * 0);
     backCtx.closePath();
     backCtx.stroke();
     backCtx.fill();
