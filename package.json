@@ -1,27 +1,27 @@
 {
   "name": "pink-trombone",
-  "version": "1.0.0",
-  "description": "Pink Trombone exhibit by [Neil Thapen](http://venuspatrol.nfshost.com/) Bare-handed procedural speech synthesis. [Original version](https://dood.al/pinktrombone/)",
-  "main": "index.js",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "http-server -p 8000",
-    "build": "tsc"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/IMAGINARY/pink-trombone.git"
+  "dependencies": {
+    "@fontsource/quicksand": "^5.0.15",
+    "fontfaceobserver": "^2.3.0",
+    "next": "14.0.3",
+    "react": "^18",
+    "react-dom": "^18"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/IMAGINARY/pink-trombone/issues"
-  },
-  "homepage": "https://github.com/IMAGINARY/pink-trombone#readme",
   "devDependencies": {
-    "@types/jquery": "^3.5.29",
-    "http-server": "^14.1.1",
-    "typescript": "^5.3.2"
+    "@types/fontfaceobserver": "^2.1.3",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.0.3",
+    "typescript": "^5"
   }
 }
