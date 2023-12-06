@@ -112,9 +112,6 @@ seed(Date.now());
 var F2 = 0.5 * (Math.sqrt(3) - 1);
 var G2 = (3 - Math.sqrt(3)) / 6;
 
-var F3 = 1 / 3;
-var G3 = 1 / 6;
-
 // 2D simplex noise
 export const simplex2 = function (xin: number, yin: number) {
   var n0, n1, n2; // Noise contributions from the three corners

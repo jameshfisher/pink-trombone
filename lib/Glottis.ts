@@ -99,8 +99,6 @@ export class GlottisClass {
     backCtx.lineCap = "round";
     backCtx.lineJoin = "round";
 
-    var radius = 2;
-
     this.drawBar(0.0, 0.4, 8);
     backCtx.globalAlpha = 0.7;
     this.drawBar(0.52, 0.72, 8);

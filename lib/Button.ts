@@ -6,8 +6,8 @@ export function nullButton(switchedOn: boolean): ButtonT {
     height: null,
     text: null,
     switchedOn: switchedOn,
-    draw: function (ctx) {},
-    drawText: function (ctx) {},
-    handleTouchStart: function (touch) {},
+    draw: function (_ctx) {},
+    drawText: function (_ctx) {},
+    handleTouchStart: function (_touch) {},
   };
 }

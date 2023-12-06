@@ -34,7 +34,7 @@ const de = {
 
 type TRANSLATION_KEY = keyof typeof en;
 
-const lang = "en";
+let lang = "en";
 
 export const i18n = {
   t: (text: TRANSLATION_KEY) => {
@@ -49,5 +49,7 @@ export const i18n = {
     queryStringVariable: string;
     translationsDirectory: string;
     defaultLanguage: string;
-  }) => {},
+  }) => {
+    lang = args.defaultLanguage;
+  },
 };

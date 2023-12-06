@@ -353,7 +353,7 @@ export class UIClass {
     UI.handleTouches();
   }
 
-  endMouse(event: MouseEvent) {
+  endMouse(_event: MouseEvent) {
     var touch = UI.mouseTouch;
     if (!touch.alive) return;
     touch.alive = false;

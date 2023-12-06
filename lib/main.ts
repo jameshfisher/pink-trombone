@@ -39,7 +39,7 @@ export function start(
   setTractUI(new TractUIClass());
 
   requestAnimationFrame(redraw);
-  function redraw(highResTimestamp: DOMHighResTimeStamp) {
+  function redraw() {
     UI.shapeToFitScreen();
     TractUI.draw();
     UI.draw();
