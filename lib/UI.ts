@@ -13,6 +13,7 @@ import {
   tractCanvas,
   tractCtx,
 } from "./globals";
+import { clamp } from "./math";
 
 export class UIClass {
   width: number;
@@ -375,13 +376,13 @@ export class UIClass {
       if (!touch.alive && time > touch.endTime + 1) {
         this.touchesWithMouse.splice(j, 1);
       } else if (touch.alive) {
-        touch.fricative_intensity = Math.clamp(
+        touch.fricative_intensity = clamp(
           (time - touch.startTime) / fricativeAttackTime,
           0,
           1
         );
       } else {
-        touch.fricative_intensity = Math.clamp(
+        touch.fricative_intensity = clamp(
           1 - (time - touch.endTime) / fricativeAttackTime,
           0,
           1

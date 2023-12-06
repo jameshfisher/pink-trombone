@@ -1,14 +1,3 @@
-interface Math {
-  clamp(number: number, min: number, max: number): number;
-  moveTowards(
-    current: number,
-    target: number,
-    amountUp: number,
-    amountDown: number
-  ): number;
-  gaussian(): number;
-}
-
 // declare var IMAGINARY: {
 //   i18n: {
 //     getLang(): unknown;

@@ -1,4 +1,5 @@
-import { AudioSystem, sampleRate, UI, Tract, Glottis } from "./globals";
+import { AudioSystem, Glottis, Tract, UI, sampleRate } from "./globals";
+import { clamp, moveTowards } from "./math";
 
 export class TractClass {
   lipOutput: any;
@@ -125,7 +126,7 @@ export class TractClass {
       else
         slowReturn =
           0.6 + (0.4 * (i - this.noseStart)) / (this.tipStart - this.noseStart);
-      this.diameter[i] = Math.moveTowards(
+      this.diameter[i] = moveTowards(
         diameter,
         targetDiameter,
         slowReturn * amount,
@@ -142,7 +143,7 @@ export class TractClass {
     this.lastObstruction = newLastObstruction;
 
     amount = deltaTime * this.movementSpeed;
-    this.noseDiameter[0] = Math.moveTowards(
+    this.noseDiameter[0] = moveTowards(
       this.noseDiameter[0],
       this.velumTarget,
       amount * 0.25,
@@ -224,8 +225,8 @@ export class TractClass {
       // this.R[i] = this.junctionOutputR[i]*0.999;
       // this.L[i] = this.junctionOutputL[i+1]*0.999;
 
-      this.R[i] = Math.clamp(this.junctionOutputR[i] * 0.999, -1, 1);
-      this.L[i] = Math.clamp(this.junctionOutputL[i + 1] * 0.999, -1, 1);
+      this.R[i] = clamp(this.junctionOutputR[i] * 0.999, -1, 1);
+      this.L[i] = clamp(this.junctionOutputL[i + 1] * 0.999, -1, 1);
 
       if (updateAmplitudes) {
         var amplitude = Math.abs(this.R[i] + this.L[i]);
@@ -250,12 +251,8 @@ export class TractClass {
       // this.noseR[i] = this.noseJunctionOutputR[i] * this.fade;
       // this.noseL[i] = this.noseJunctionOutputL[i+1] * this.fade;
 
-      this.noseR[i] = Math.clamp(this.noseJunctionOutputR[i] * 0.999, -1, 1);
-      this.noseL[i] = Math.clamp(
-        this.noseJunctionOutputL[i + 1] * 0.999,
-        -1,
-        1
-      );
+      this.noseR[i] = clamp(this.noseJunctionOutputR[i] * 0.999, -1, 1);
+      this.noseL[i] = clamp(this.noseJunctionOutputL[i + 1] * 0.999, -1, 1);
 
       if (updateAmplitudes) {
         var amplitude = Math.abs(this.noseR[i] + this.noseL[i]);
@@ -324,8 +321,8 @@ export class TractClass {
     var i = Math.floor(index);
     var delta = index - i;
     turbulenceNoise *= Glottis.getNoiseModulator();
-    var thinness0 = Math.clamp(8 * (0.7 - diameter), 0, 1);
-    var openness = Math.clamp(30 * (diameter - 0.3), 0, 1);
+    var thinness0 = clamp(8 * (0.7 - diameter), 0, 1);
+    var openness = clamp(30 * (diameter - 0.3), 0, 1);
     var noise0 = turbulenceNoise * (1 - delta) * thinness0 * openness;
     var noise1 = turbulenceNoise * delta * thinness0 * openness;
     this.R[i + 1] += noise0 / 2;

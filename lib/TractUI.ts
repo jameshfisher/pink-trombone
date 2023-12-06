@@ -1,18 +1,19 @@
-import * as IMAGINARY from "./i18n";
 import {
-  tractCtx,
+  CANVAS_SCALE,
+  Glottis,
   Tract,
+  TractUI,
+  UI,
+  alwaysVoice,
+  backCtx,
+  palePink,
+  temp,
   time,
   tractCanvas,
-  UI,
-  backCtx,
-  Glottis,
-  alwaysVoice,
-  palePink,
-  TractUI,
-  temp,
-  CANVAS_SCALE,
+  tractCtx,
 } from "./globals";
+import * as IMAGINARY from "./i18n";
+import { clamp } from "./math";
 
 export class TractUIClass {
   originX: number;
@@ -562,20 +563,20 @@ export class TractUIClass {
       var fromPoint =
         (this.outerTongueControlRadius - diameter) /
         (this.outerTongueControlRadius - this.innerTongueControlRadius);
-      fromPoint = Math.clamp(fromPoint, 0, 1);
+      fromPoint = clamp(fromPoint, 0, 1);
       fromPoint =
         Math.pow(fromPoint, 0.58) - 0.2 * (fromPoint * fromPoint - fromPoint); //horrible kludge to fit curve to straight line
-      this.tongueDiameter = Math.clamp(
+      this.tongueDiameter = clamp(
         diameter,
         this.innerTongueControlRadius,
         this.outerTongueControlRadius
       );
-      //this.tongueIndex = Math.clamp(index, this.tongueLowerIndexBound, this.tongueUpperIndexBound);
+      //this.tongueIndex = clamp(index, this.tongueLowerIndexBound, this.tongueUpperIndexBound);
       var out =
         fromPoint *
         0.5 *
         (this.tongueUpperIndexBound - this.tongueLowerIndexBound);
-      this.tongueIndex = Math.clamp(
+      this.tongueIndex = clamp(
         index,
         this.tongueIndexCentre - out,
         this.tongueIndexCentre + out

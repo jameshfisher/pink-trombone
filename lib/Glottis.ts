@@ -11,6 +11,7 @@ import {
   backCtx,
   CANVAS_SCALE,
 } from "./globals";
+import { clamp } from "./math";
 
 export class GlottisClass {
   timeInWaveform: number;
@@ -228,12 +229,12 @@ export class GlottisClass {
       this.isTouchingSomewhere = true;
       var local_y = this.touch.y - this.keyboardTop - 10;
       var local_x = this.touch.x - this.keyboardLeft;
-      local_y = Math.clamp(local_y, 0, this.keyboardHeight - 26);
+      local_y = clamp(local_y, 0, this.keyboardHeight - 26);
       var semitone = (this.semitones * local_x) / this.keyboardWidth + 0.5;
       Glottis.UIFrequency = this.baseNote * Math.pow(2, semitone / 12);
       if (Glottis.intensity == 0) Glottis.smoothFrequency = Glottis.UIFrequency;
       //Glottis.UIRd = 3*local_y / (this.keyboardHeight-20);
-      var t = Math.clamp(1 - local_y / (this.keyboardHeight - 28), 0, 1);
+      var t = clamp(1 - local_y / (this.keyboardHeight - 28), 0, 1);
       Glottis.UITenseness = 1 - Math.cos(t * Math.PI * 0.5);
       Glottis.loudness = Math.pow(Glottis.UITenseness, 0.25);
       this.x = this.touch.x;
@@ -312,7 +313,7 @@ export class GlottisClass {
     if (this.isTouched || alwaysVoice || this.isTouchingSomewhere)
       this.intensity += 0.13;
     else this.intensity -= AudioSystem.blockTime * 5;
-    this.intensity = Math.clamp(this.intensity, 0, 1);
+    this.intensity = clamp(this.intensity, 0, 1);
   }
 
   setupWaveform(lambda: number) {
