@@ -270,7 +270,7 @@ export class UIClass {
     this.handleTouches();
   }
 
-  getTouchById(id: unknown) {
+  getTouchById(id: string | number) {
     for (let j = 0; j < UI.touchesWithMouse.length; j++) {
       if (UI.touchesWithMouse[j].id == id && UI.touchesWithMouse[j].alive)
         return UI.touchesWithMouse[j];

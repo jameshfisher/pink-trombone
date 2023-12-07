@@ -1,21 +1,9 @@
-// declare var IMAGINARY: {
-//   i18n: {
-//     getLang(): unknown;
-//     t: (text: string) => string;
-//     init: (args: {
-//       queryStringVariable: string;
-//       translationsDirectory: string;
-//       defaultLanguage: string;
-//     }) => Promise<unknown>;
-//   };
-// };
-
 type TouchT = {
   startTime: number;
   endTime: number;
   fricative_intensity: number;
   alive: boolean;
-  id: unknown;
+  id: string | number;
   x: number;
   y: number;
   index: number;
@@ -24,10 +12,10 @@ type TouchT = {
 
 type Transient = {
   strength: number;
-  exponent: any;
+  exponent: number;
   timeAlive: number;
   position: number;
-  lifeTime: any;
+  lifeTime: number;
 };
 
 type ButtonT = {
@@ -37,7 +25,7 @@ type ButtonT = {
   height: null;
   text: null;
   switchedOn: boolean;
-  draw: (ctx: any) => void;
-  drawText: (ctx: any) => void;
-  handleTouchStart: (touch: any) => void;
+  draw: (ctx: unknown) => void;
+  drawText: (ctx: unknown) => void;
+  handleTouchStart: (touch: unknown) => void;
 };

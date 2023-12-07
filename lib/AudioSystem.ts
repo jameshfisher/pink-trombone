@@ -1,7 +1,7 @@
 import { Glottis, Tract, sampleRate, setSampleRate } from "./globals";
 
 export class AudioSystemClass {
-  started: unknown;
+  started: boolean;
   blockLength: number;
   blockTime: number;
   soundOn: boolean;
