@@ -1,14 +1,14 @@
 import * as IMAGINARY from "./i18n";
-import { AudioSystemClass } from "./AudioSystem";
-import { GlottisClass } from "./Glottis";
-import { TractClass } from "./Tract";
-import { TractUIClass } from "./TractUI";
-import { UIClass } from "./UI";
+import { AudioSystem } from "./AudioSystem";
+import { Glottis } from "./Glottis";
+import { Tract } from "./Tract";
+import { TractUI } from "./TractUI";
+import { UI } from "./UI";
 import FontFaceObserver from "fontfaceobserver";
 
 import {
-  TractUI,
-  UI,
+  tractUI,
+  ui,
   setAudioSystem,
   setBackCanvas,
   setBackCtx,
@@ -32,20 +32,20 @@ export function start(
 
   document.body.style.cursor = "pointer";
 
-  setAudioSystem(new AudioSystemClass());
-  setUI(new UIClass());
-  setGlottis(new GlottisClass());
-  setTract(new TractClass());
-  setTractUI(new TractUIClass());
+  setAudioSystem(new AudioSystem());
+  setUI(new UI());
+  setGlottis(new Glottis());
+  setTract(new Tract());
+  setTractUI(new TractUI());
 
   requestAnimationFrame(redraw);
   function redraw() {
-    UI.shapeToFitScreen();
-    TractUI.draw();
-    UI.draw();
+    ui.shapeToFitScreen();
+    tractUI.draw();
+    ui.draw();
     requestAnimationFrame(redraw);
     setTime(Date.now() / 1000);
-    UI.updateTouches();
+    ui.updateTouches();
   }
 
   addLanguageSwitcher();

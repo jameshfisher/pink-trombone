@@ -1,10 +1,10 @@
 import { nullButton } from "./Button";
 import {
-  AudioSystem,
+  audioSystem,
   CANVAS_SCALE,
-  Glottis,
-  TractUI,
-  UI,
+  glottis,
+  tractUI,
+  ui,
   backCanvas,
   isFirefox,
   setAlwaysVoice,
@@ -15,7 +15,7 @@ import {
 } from "./globals";
 import { clamp } from "./math";
 
-export class UIClass {
+export class UI {
   width: number;
   top_margin: number;
   left_margin: number;
@@ -79,7 +79,7 @@ export class UIClass {
     document.addEventListener("mousemove", this.moveMouse);
   }
 
-  draw(this: UIClass) {
+  draw(this: UI) {
     this.alwaysVoiceButton.draw(tractCtx);
     this.autoWobbleButton.draw(tractCtx);
     this.aboutButton.draw(tractCtx);
@@ -137,7 +137,7 @@ export class UIClass {
   }
 
   drawInstructionsScreen() {
-    AudioSystem.mute();
+    audioSystem.mute();
     const ctx = tractCtx;
     ctx.globalAlpha = 0.85;
     ctx.fillStyle = "white";
@@ -200,9 +200,9 @@ export class UIClass {
       window.location.href = "http://venuspatrol.nfshost.com";
     else if (x >= 370 && x <= 570 && y >= 505 && y <= 555) location.reload();
     else {
-      UI.inInstructionsScreen = false;
-      UI.aboutButton.switchedOn = true;
-      AudioSystem.unmute();
+      ui.inInstructionsScreen = false;
+      ui.aboutButton.switchedOn = true;
+      audioSystem.unmute();
     }
   }
 
@@ -226,13 +226,13 @@ export class UIClass {
 
   startTouches(event: TouchEvent) {
     event.preventDefault();
-    if (!AudioSystem.started) {
-      AudioSystem.started = true;
-      AudioSystem.startSound();
+    if (!audioSystem.started) {
+      audioSystem.started = true;
+      audioSystem.startSound();
     }
 
     if (this.inAboutScreen) {
-      UI.inAboutScreen = false;
+      ui.inAboutScreen = false;
       return;
     }
 
@@ -260,8 +260,8 @@ export class UIClass {
         id: touches[j].identifier,
         x: x,
         y: y,
-        index: TractUI.getIndex(x, y),
-        diameter: TractUI.getDiameter(x, y),
+        index: tractUI.getIndex(x, y),
+        diameter: tractUI.getDiameter(x, y),
       };
       this.touchesWithMouse.push(touch);
       this.buttonsHandleTouchStart(touch);
@@ -271,9 +271,9 @@ export class UIClass {
   }
 
   getTouchById(id: string | number) {
-    for (let j = 0; j < UI.touchesWithMouse.length; j++) {
-      if (UI.touchesWithMouse[j].id == id && UI.touchesWithMouse[j].alive)
-        return UI.touchesWithMouse[j];
+    for (let j = 0; j < ui.touchesWithMouse.length; j++) {
+      if (ui.touchesWithMouse[j].id == id && ui.touchesWithMouse[j].alive)
+        return ui.touchesWithMouse[j];
     }
     return null;
   }
@@ -281,12 +281,12 @@ export class UIClass {
   moveTouches(event: TouchEvent) {
     const touches = event.changedTouches;
     for (let j = 0; j < touches.length; j++) {
-      const touch = UI.getTouchById(touches[j].identifier);
+      const touch = ui.getTouchById(touches[j].identifier);
       if (touch !== null) {
-        touch.x = ((touches[j].pageX - UI.left_margin) / UI.width) * 600;
-        touch.y = ((touches[j].pageY - UI.top_margin) / UI.width) * 600;
-        touch.index = TractUI.getIndex(touch.x, touch.y);
-        touch.diameter = TractUI.getDiameter(touch.x, touch.y);
+        touch.x = ((touches[j].pageX - ui.left_margin) / ui.width) * 600;
+        touch.y = ((touches[j].pageY - ui.top_margin) / ui.width) * 600;
+        touch.index = tractUI.getIndex(touch.x, touch.y);
+        touch.diameter = tractUI.getDiameter(touch.x, touch.y);
       }
     }
     this.handleTouches();
@@ -301,31 +301,31 @@ export class UIClass {
         touch.endTime = time;
       }
     }
-    UI.handleTouches();
+    ui.handleTouches();
 
-    if (!UI.aboutButton.switchedOn) {
-      UI.inInstructionsScreen = true;
+    if (!ui.aboutButton.switchedOn) {
+      ui.inInstructionsScreen = true;
     }
   }
 
   startMouse(event: MouseEvent) {
-    if (!AudioSystem.started) {
-      AudioSystem.started = true;
-      AudioSystem.startSound();
+    if (!audioSystem.started) {
+      audioSystem.started = true;
+      audioSystem.startSound();
     }
     if (this.inAboutScreen) {
-      UI.inAboutScreen = false;
+      ui.inAboutScreen = false;
       return;
     }
     if (this.inInstructionsScreen) {
-      const x = ((event.pageX - tractCanvas.offsetLeft) / UI.width) * 600;
-      const y = ((event.pageY - tractCanvas.offsetTop) / UI.width) * 600;
-      UI.instructionsScreenHandleTouch(x, y);
+      const x = ((event.pageX - tractCanvas.offsetLeft) / ui.width) * 600;
+      const y = ((event.pageY - tractCanvas.offsetTop) / ui.width) * 600;
+      ui.instructionsScreenHandleTouch(x, y);
       return;
     }
 
-    const x = ((event.pageX - tractCanvas.offsetLeft) / UI.width) * 600;
-    const y = ((event.pageY - tractCanvas.offsetTop) / UI.width) * 600;
+    const x = ((event.pageX - tractCanvas.offsetLeft) / ui.width) * 600;
+    const y = ((event.pageY - tractCanvas.offsetTop) / ui.width) * 600;
     const touch: TouchT = {
       startTime: time,
       fricative_intensity: 0,
@@ -334,8 +334,8 @@ export class UIClass {
       id: "mouse" + Math.random(),
       x: x,
       y: y,
-      index: TractUI.getIndex(x, y),
-      diameter: TractUI.getDiameter(x, y),
+      index: tractUI.getIndex(x, y),
+      diameter: tractUI.getDiameter(x, y),
     };
 
     this.mouseTouch = touch;
@@ -345,28 +345,28 @@ export class UIClass {
   }
 
   moveMouse(event: MouseEvent) {
-    const touch = UI.mouseTouch;
+    const touch = ui.mouseTouch;
     if (!touch.alive) return;
-    touch.x = ((event.pageX - tractCanvas.offsetLeft) / UI.width) * 600;
-    touch.y = ((event.pageY - tractCanvas.offsetTop) / UI.width) * 600;
-    touch.index = TractUI.getIndex(touch.x, touch.y);
-    touch.diameter = TractUI.getDiameter(touch.x, touch.y);
-    UI.handleTouches();
+    touch.x = ((event.pageX - tractCanvas.offsetLeft) / ui.width) * 600;
+    touch.y = ((event.pageY - tractCanvas.offsetTop) / ui.width) * 600;
+    touch.index = tractUI.getIndex(touch.x, touch.y);
+    touch.diameter = tractUI.getDiameter(touch.x, touch.y);
+    ui.handleTouches();
   }
 
   endMouse(_event: MouseEvent) {
-    const touch = UI.mouseTouch;
+    const touch = ui.mouseTouch;
     if (!touch.alive) return;
     touch.alive = false;
     touch.endTime = time;
-    UI.handleTouches();
+    ui.handleTouches();
 
-    if (!UI.aboutButton.switchedOn) UI.inInstructionsScreen = true;
+    if (!ui.aboutButton.switchedOn) ui.inInstructionsScreen = true;
   }
 
   handleTouches() {
-    TractUI.handleTouches();
-    Glottis.handleTouches();
+    tractUI.handleTouches();
+    glottis.handleTouches();
   }
 
   updateTouches() {

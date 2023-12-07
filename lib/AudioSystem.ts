@@ -1,4 +1,4 @@
-import { Glottis, Tract, sampleRate, setSampleRate } from "./globals";
+import { glottis, tract, sampleRate, setSampleRate } from "./globals";
 
 // blockLength Can be set to 512 for more responsiveness but
 // potential crackling if CPU can't fill the buffer fast enough (latency)
@@ -11,21 +11,21 @@ function doScriptProcessor(event: AudioProcessingEvent) {
   for (let j = 0, N = outArray.length; j < N; j++) {
     const lambda1 = j / N;
     const lambda2 = (j + 0.5) / N;
-    const glottalOutput = Glottis.runStep(lambda1, inputArray1[j]);
+    const glottalOutput = glottis.runStep(lambda1, inputArray1[j]);
 
     let vocalOutput = 0;
     //Tract runs at twice the sample rate
-    Tract.runStep(glottalOutput, inputArray2[j], lambda1);
-    vocalOutput += Tract.lipOutput + Tract.noseOutput;
-    Tract.runStep(glottalOutput, inputArray2[j], lambda2);
-    vocalOutput += Tract.lipOutput + Tract.noseOutput;
+    tract.runStep(glottalOutput, inputArray2[j], lambda1);
+    vocalOutput += tract.lipOutput + tract.noseOutput;
+    tract.runStep(glottalOutput, inputArray2[j], lambda2);
+    vocalOutput += tract.lipOutput + tract.noseOutput;
     outArray[j] = vocalOutput * 0.125;
   }
-  Glottis.finishBlock();
-  Tract.finishBlock();
+  glottis.finishBlock();
+  tract.finishBlock();
 }
 
-export class AudioSystemClass {
+export class AudioSystem {
   started: boolean;
   blockTime: number;
   audioContext: AudioContext;

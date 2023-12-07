@@ -1,7 +1,7 @@
-import { AudioSystem, Glottis, Tract, UI, sampleRate } from "./globals";
+import { audioSystem, glottis, tract, ui, sampleRate } from "./globals";
 import { clamp, moveTowards } from "./math";
 
-export class TractClass {
+export class Tract {
   lipOutput: number;
   noseOutput: number;
   readonly n: number;
@@ -270,7 +270,7 @@ export class TractClass {
   }
 
   finishBlock() {
-    this.reshapeTract(AudioSystem.blockTime);
+    this.reshapeTract(audioSystem.blockTime);
     this.calculateReflections();
   }
 
@@ -303,9 +303,9 @@ export class TractClass {
   }
 
   addTurbulenceNoise(turbulenceNoise: number) {
-    for (let j = 0; j < UI.touchesWithMouse.length; j++) {
-      const touch = UI.touchesWithMouse[j];
-      if (touch.index < 2 || touch.index > Tract.n) continue;
+    for (let j = 0; j < ui.touchesWithMouse.length; j++) {
+      const touch = ui.touchesWithMouse[j];
+      if (touch.index < 2 || touch.index > tract.n) continue;
       if (touch.diameter <= 0) continue;
       const intensity = touch.fricative_intensity;
       if (intensity == 0) continue;
@@ -324,7 +324,7 @@ export class TractClass {
   ) {
     const i = Math.floor(index);
     const delta = index - i;
-    turbulenceNoise *= Glottis.getNoiseModulator();
+    turbulenceNoise *= glottis.getNoiseModulator();
     const thinness0 = clamp(8 * (0.7 - diameter), 0, 1);
     const openness = clamp(30 * (diameter - 0.3), 0, 1);
     const noise0 = turbulenceNoise * (1 - delta) * thinness0 * openness;

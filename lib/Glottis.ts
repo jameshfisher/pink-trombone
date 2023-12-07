@@ -5,15 +5,15 @@ import {
   sampleRate,
   autoWobble,
   alwaysVoice,
-  AudioSystem,
-  Glottis,
-  UI,
+  audioSystem,
+  glottis,
+  ui,
   backCtx,
   CANVAS_SCALE,
 } from "./globals";
 import { clamp } from "./math";
 
-export class GlottisClass {
+export class Glottis {
   timeInWaveform: number;
   oldFrequency: number;
   newFrequency: number;
@@ -216,8 +216,8 @@ export class GlottisClass {
     }
 
     if (this.touch == null) {
-      for (let j = 0; j < UI.touchesWithMouse.length; j++) {
-        const touch = UI.touchesWithMouse[j];
+      for (let j = 0; j < ui.touchesWithMouse.length; j++) {
+        const touch = ui.touchesWithMouse[j];
         if (!touch.alive) continue;
         this.isTouchingSomewhere = true;
         if (touch.y < this.keyboardTop) continue;
@@ -231,16 +231,16 @@ export class GlottisClass {
       const local_x = this.touch.x - this.keyboardLeft;
       local_y = clamp(local_y, 0, this.keyboardHeight - 26);
       const semitone = (this.semitones * local_x) / this.keyboardWidth + 0.5;
-      Glottis.UIFrequency = this.baseNote * Math.pow(2, semitone / 12);
-      if (Glottis.intensity == 0) Glottis.smoothFrequency = Glottis.UIFrequency;
+      glottis.UIFrequency = this.baseNote * Math.pow(2, semitone / 12);
+      if (glottis.intensity == 0) glottis.smoothFrequency = glottis.UIFrequency;
       //Glottis.UIRd = 3*local_y / (this.keyboardHeight-20);
       const t = clamp(1 - local_y / (this.keyboardHeight - 28), 0, 1);
-      Glottis.UITenseness = 1 - Math.cos(t * Math.PI * 0.5);
-      Glottis.loudness = Math.pow(Glottis.UITenseness, 0.25);
+      glottis.UITenseness = 1 - Math.cos(t * Math.PI * 0.5);
+      glottis.loudness = Math.pow(glottis.UITenseness, 0.25);
       this.x = this.touch.x;
       this.y = local_y + this.keyboardTop + 10;
     }
-    Glottis.isTouched = this.touch != null;
+    glottis.isTouched = this.touch != null;
   }
 
   runStep(lambda: number, noiseSource: number) {
@@ -312,7 +312,7 @@ export class GlottisClass {
 
     if (this.isTouched || alwaysVoice || this.isTouchingSomewhere)
       this.intensity += 0.13;
-    else this.intensity -= AudioSystem.blockTime * 5;
+    else this.intensity -= audioSystem.blockTime * 5;
     this.intensity = clamp(this.intensity, 0, 1);
   }
 

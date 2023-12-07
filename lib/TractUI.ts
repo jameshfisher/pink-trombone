@@ -1,9 +1,9 @@
 import {
   CANVAS_SCALE,
-  Glottis,
-  Tract,
-  TractUI,
-  UI,
+  glottis,
+  tract,
+  tractUI,
+  ui,
   alwaysVoice,
   backCtx,
   palePink,
@@ -15,7 +15,7 @@ import {
 import * as IMAGINARY from "./i18n";
 import { clamp } from "./math";
 
-export class TractUIClass {
+export class TractUI {
   readonly originX: number;
   readonly originY: number;
   readonly radius: number;
@@ -55,23 +55,23 @@ export class TractUIClass {
 
     this.ctx = tractCtx;
     this.setRestDiameter();
-    for (let i = 0; i < Tract.n; i++) {
-      Tract.diameter[i] = Tract.targetDiameter[i] = Tract.restDiameter[i];
+    for (let i = 0; i < tract.n; i++) {
+      tract.diameter[i] = tract.targetDiameter[i] = tract.restDiameter[i];
     }
     this.drawBackground();
-    this.tongueLowerIndexBound = Tract.bladeStart + 2;
-    this.tongueUpperIndexBound = Tract.tipStart - 3;
+    this.tongueLowerIndexBound = tract.bladeStart + 2;
+    this.tongueUpperIndexBound = tract.tipStart - 3;
     this.tongueIndexCentre =
       0.5 * (this.tongueLowerIndexBound + this.tongueUpperIndexBound);
   }
 
   moveTo(i: number, d: number) {
     let angle =
-      this.angleOffset + (i * this.angleScale * Math.PI) / (Tract.lipStart - 1);
+      this.angleOffset + (i * this.angleScale * Math.PI) / (tract.lipStart - 1);
     let wobble =
-      Tract.maxAmplitude[Tract.n - 1] +
-      Tract.noseMaxAmplitude[Tract.noseLength - 1];
-    wobble *= (0.03 * Math.sin(2 * i - 50 * time) * i) / Tract.n;
+      tract.maxAmplitude[tract.n - 1] +
+      tract.noseMaxAmplitude[tract.noseLength - 1];
+    wobble *= (0.03 * Math.sin(2 * i - 50 * time) * i) / tract.n;
     angle += wobble;
     const r = this.radius - this.scale * d + 100 * wobble;
     this.ctx.moveTo(
@@ -82,11 +82,11 @@ export class TractUIClass {
 
   lineTo(i: number, d: number) {
     let angle =
-      this.angleOffset + (i * this.angleScale * Math.PI) / (Tract.lipStart - 1);
+      this.angleOffset + (i * this.angleScale * Math.PI) / (tract.lipStart - 1);
     let wobble =
-      Tract.maxAmplitude[Tract.n - 1] +
-      Tract.noseMaxAmplitude[Tract.noseLength - 1];
-    wobble *= (0.03 * Math.sin(2 * i - 50 * time) * i) / Tract.n;
+      tract.maxAmplitude[tract.n - 1] +
+      tract.noseMaxAmplitude[tract.noseLength - 1];
+    wobble *= (0.03 * Math.sin(2 * i - 50 * time) * i) / tract.n;
     angle += wobble;
     const r = this.radius - this.scale * d + 100 * wobble;
     this.ctx.lineTo(
@@ -97,7 +97,7 @@ export class TractUIClass {
 
   drawText(i: number, d: number, text: string) {
     const angle =
-      this.angleOffset + (i * this.angleScale * Math.PI) / (Tract.lipStart - 1);
+      this.angleOffset + (i * this.angleScale * Math.PI) / (tract.lipStart - 1);
     const r = this.radius - this.scale * d;
     this.ctx.save();
     this.ctx.translate(
@@ -111,7 +111,7 @@ export class TractUIClass {
 
   drawTextStraight(i: number, d: number, text: string) {
     const angle =
-      this.angleOffset + (i * this.angleScale * Math.PI) / (Tract.lipStart - 1);
+      this.angleOffset + (i * this.angleScale * Math.PI) / (tract.lipStart - 1);
     const r = this.radius - this.scale * d;
     this.ctx.save();
     this.ctx.translate(
@@ -125,7 +125,7 @@ export class TractUIClass {
 
   drawCircle(i: number, d: number, radius: number) {
     const angle =
-      this.angleOffset + (i * this.angleScale * Math.PI) / (Tract.lipStart - 1);
+      this.angleOffset + (i * this.angleScale * Math.PI) / (tract.lipStart - 1);
     const r = this.radius - this.scale * d;
     this.ctx.beginPath();
     this.ctx.arc(
@@ -144,7 +144,7 @@ export class TractUIClass {
     let angle = Math.atan2(yy, xx);
     while (angle > 0) angle -= 2 * Math.PI;
     return (
-      ((Math.PI + angle - this.angleOffset) * (Tract.lipStart - 1)) /
+      ((Math.PI + angle - this.angleOffset) * (tract.lipStart - 1)) /
       (this.angleScale * Math.PI)
     );
   }
@@ -167,7 +167,7 @@ export class TractUIClass {
     this.drawTongueControl();
     this.drawPitchControl();
 
-    const velum = Tract.noseDiameter[0];
+    const velum = tract.noseDiameter[0];
     const velumAngle = velum * 4;
 
     //first draw fill
@@ -176,8 +176,8 @@ export class TractUIClass {
     this.ctx.strokeStyle = this.fillColour;
     this.ctx.fillStyle = this.fillColour;
     this.moveTo(1, 0);
-    for (let i = 1; i < Tract.n; i++) this.lineTo(i, Tract.diameter[i]);
-    for (let i = Tract.n - 1; i >= 2; i--) this.lineTo(i, 0);
+    for (let i = 1; i < tract.n; i++) this.lineTo(i, tract.diameter[i]);
+    for (let i = tract.n - 1; i >= 2; i--) this.lineTo(i, 0);
     this.ctx.closePath();
     this.ctx.stroke();
     this.ctx.fill();
@@ -187,14 +187,14 @@ export class TractUIClass {
     this.ctx.lineWidth = CANVAS_SCALE * 2;
     this.ctx.strokeStyle = this.fillColour;
     this.ctx.fillStyle = this.fillColour;
-    this.moveTo(Tract.noseStart, -this.noseOffset);
-    for (let i = 1; i < Tract.noseLength; i++)
+    this.moveTo(tract.noseStart, -this.noseOffset);
+    for (let i = 1; i < tract.noseLength; i++)
       this.lineTo(
-        i + Tract.noseStart,
-        -this.noseOffset - Tract.noseDiameter[i] * 0.9
+        i + tract.noseStart,
+        -this.noseOffset - tract.noseDiameter[i] * 0.9
       );
-    for (let i = Tract.noseLength - 1; i >= 1; i--)
-      this.lineTo(i + Tract.noseStart, -this.noseOffset);
+    for (let i = tract.noseLength - 1; i >= 1; i--)
+      this.lineTo(i + tract.noseStart, -this.noseOffset);
     this.ctx.closePath();
     //this.ctx.stroke();
     this.ctx.fill();
@@ -204,10 +204,10 @@ export class TractUIClass {
     this.ctx.lineWidth = CANVAS_SCALE * 2;
     this.ctx.strokeStyle = this.fillColour;
     this.ctx.fillStyle = this.fillColour;
-    this.moveTo(Tract.noseStart - 2, 0);
-    this.lineTo(Tract.noseStart, -this.noseOffset);
-    this.lineTo(Tract.noseStart + velumAngle, -this.noseOffset);
-    this.lineTo(Tract.noseStart + velumAngle - 2, 0);
+    this.moveTo(tract.noseStart - 2, 0);
+    this.lineTo(tract.noseStart, -this.noseOffset);
+    this.lineTo(tract.noseStart + velumAngle, -this.noseOffset);
+    this.lineTo(tract.noseStart + velumAngle - 2, 0);
     this.ctx.closePath();
     this.ctx.stroke();
     this.ctx.fill();
@@ -217,10 +217,10 @@ export class TractUIClass {
     this.ctx.font = "bold 40px Quicksand";
     this.ctx.textAlign = "center";
     this.ctx.globalAlpha = 1.0;
-    this.drawText(Tract.n * 0.1, 0.425, IMAGINARY.i18n.t("THROAT"));
-    this.drawText(Tract.n * 0.7, -1.5, IMAGINARY.i18n.t("NASAL_CAVITY"));
+    this.drawText(tract.n * 0.1, 0.425, IMAGINARY.i18n.t("THROAT"));
+    this.drawText(tract.n * 0.7, -1.5, IMAGINARY.i18n.t("NASAL_CAVITY"));
     this.ctx.font = "bold 40px Quicksand";
-    this.drawText(Tract.n * 0.7, 0.9, IMAGINARY.i18n.t("ORAL_CAVITY"));
+    this.drawText(tract.n * 0.7, 0.9, IMAGINARY.i18n.t("ORAL_CAVITY"));
 
     this.drawAmplitudes();
 
@@ -230,12 +230,12 @@ export class TractUIClass {
     this.ctx.strokeStyle = this.lineColour;
     this.ctx.lineJoin = "round";
     this.ctx.lineCap = "round";
-    this.moveTo(1, Tract.diameter[0]);
-    for (let i = 2; i < Tract.n; i++) this.lineTo(i, Tract.diameter[i]);
+    this.moveTo(1, tract.diameter[0]);
+    for (let i = 2; i < tract.n; i++) this.lineTo(i, tract.diameter[i]);
     this.moveTo(1, 0);
-    for (let i = 2; i <= Tract.noseStart - 2; i++) this.lineTo(i, 0);
-    this.moveTo(Tract.noseStart + velumAngle - 2, 0);
-    for (let i = Tract.noseStart + Math.ceil(velumAngle) - 2; i < Tract.n; i++)
+    for (let i = 2; i <= tract.noseStart - 2; i++) this.lineTo(i, 0);
+    this.moveTo(tract.noseStart + velumAngle - 2, 0);
+    for (let i = tract.noseStart + Math.ceil(velumAngle) - 2; i < tract.n; i++)
       this.lineTo(i, 0);
     this.ctx.stroke();
 
@@ -244,24 +244,24 @@ export class TractUIClass {
     this.ctx.lineWidth = CANVAS_SCALE * 5;
     this.ctx.strokeStyle = this.lineColour;
     this.ctx.lineJoin = "round";
-    this.moveTo(Tract.noseStart, -this.noseOffset);
-    for (let i = 1; i < Tract.noseLength; i++)
+    this.moveTo(tract.noseStart, -this.noseOffset);
+    for (let i = 1; i < tract.noseLength; i++)
       this.lineTo(
-        i + Tract.noseStart,
-        -this.noseOffset - Tract.noseDiameter[i] * 0.9
+        i + tract.noseStart,
+        -this.noseOffset - tract.noseDiameter[i] * 0.9
       );
-    this.moveTo(Tract.noseStart + velumAngle, -this.noseOffset);
-    for (let i = Math.ceil(velumAngle); i < Tract.noseLength; i++)
-      this.lineTo(i + Tract.noseStart, -this.noseOffset);
+    this.moveTo(tract.noseStart + velumAngle, -this.noseOffset);
+    for (let i = Math.ceil(velumAngle); i < tract.noseLength; i++)
+      this.lineTo(i + tract.noseStart, -this.noseOffset);
     this.ctx.stroke();
 
     //velum
     this.ctx.globalAlpha = velum * 5;
     this.ctx.beginPath();
-    this.moveTo(Tract.noseStart - 2, 0);
-    this.lineTo(Tract.noseStart, -this.noseOffset);
-    this.moveTo(Tract.noseStart + velumAngle - 2, 0);
-    this.lineTo(Tract.noseStart + velumAngle, -this.noseOffset);
+    this.moveTo(tract.noseStart - 2, 0);
+    this.lineTo(tract.noseStart, -this.noseOffset);
+    this.moveTo(tract.noseStart + velumAngle - 2, 0);
+    this.lineTo(tract.noseStart + velumAngle, -this.noseOffset);
     this.ctx.stroke();
 
     this.ctx.fillStyle = "orchid";
@@ -269,15 +269,15 @@ export class TractUIClass {
     this.ctx.textAlign = "center";
     this.ctx.globalAlpha = 0.7;
     this.drawText(
-      Tract.n * 0.95,
-      0.8 + 0.8 * Tract.diameter[Tract.n - 1],
+      tract.n * 0.95,
+      0.8 + 0.8 * tract.diameter[tract.n - 1],
       " " + IMAGINARY.i18n.t("LIP")
     );
 
     this.ctx.globalAlpha = 1.0;
     this.ctx.fillStyle = "black";
     this.ctx.textAlign = "left";
-    this.ctx.fillText(UI.debugText, CANVAS_SCALE * 20, CANVAS_SCALE * 20);
+    this.ctx.fillText(ui.debugText, CANVAS_SCALE * 20, CANVAS_SCALE * 20);
     //this.drawPositions();
   }
 
@@ -289,44 +289,44 @@ export class TractUIClass {
     this.ctx.font = "bold 28px Quicksand";
     this.ctx.textAlign = "center";
     this.ctx.globalAlpha = 0.7;
-    this.drawText(Tract.n * 0.44, -0.28, IMAGINARY.i18n.t("SOFT_PALATE_1"));
+    this.drawText(tract.n * 0.44, -0.28, IMAGINARY.i18n.t("SOFT_PALATE_1"));
     this.drawText(
-      Tract.n *
+      tract.n *
         (0.47 +
           this.ctx.measureText(IMAGINARY.i18n.t("SOFT_PALATE_1")).width *
             0.001),
       -0.28,
       IMAGINARY.i18n.t("SOFT_PALATE_2")
     );
-    this.drawText(Tract.n * 0.74, -0.28, IMAGINARY.i18n.t("HARD_PALATE_1"));
+    this.drawText(tract.n * 0.74, -0.28, IMAGINARY.i18n.t("HARD_PALATE_1"));
     this.drawText(
-      Tract.n *
+      tract.n *
         (0.77 +
           +this.ctx.measureText(IMAGINARY.i18n.t("HARD_PALATE_1")).width *
             0.001),
       -0.28,
       IMAGINARY.i18n.t("HARD_PALATE_2")
     );
-    this.drawText(Tract.n * 0.95, -0.28, " " + IMAGINARY.i18n.t("LIP"));
+    this.drawText(tract.n * 0.95, -0.28, " " + IMAGINARY.i18n.t("LIP"));
 
     this.ctx.font = "bold 28px Quicksand";
     this.drawTextStraight(
-      Tract.n * 0.18,
+      tract.n * 0.18,
       3,
       "  " + IMAGINARY.i18n.t("TONGUE_CONTROL")
     );
     this.ctx.textAlign = "left";
-    this.drawText(Tract.n * 1.01, -1.07, IMAGINARY.i18n.t("NASALS"));
-    this.drawText(Tract.n * 1.01, -0.28, IMAGINARY.i18n.t("STOPS"));
-    this.drawText(Tract.n * 1.01, 0.51, IMAGINARY.i18n.t("FRICATIVES"));
+    this.drawText(tract.n * 1.01, -1.07, IMAGINARY.i18n.t("NASALS"));
+    this.drawText(tract.n * 1.01, -0.28, IMAGINARY.i18n.t("STOPS"));
+    this.drawText(tract.n * 1.01, 0.51, IMAGINARY.i18n.t("FRICATIVES"));
     //this.drawTextStraight(1.5, +0.8, "glottis")
     this.ctx.strokeStyle = "orchid";
     this.ctx.lineWidth = CANVAS_SCALE * 2;
     this.ctx.beginPath();
-    this.moveTo(Tract.n * 1.01, 0);
-    this.lineTo(Tract.n * 1.04, 0);
-    this.moveTo(Tract.n * 1.01, -this.noseOffset);
-    this.lineTo(Tract.n * 1.04, -this.noseOffset);
+    this.moveTo(tract.n * 1.01, 0);
+    this.lineTo(tract.n * 1.04, 0);
+    this.moveTo(tract.n * 1.01, -this.noseOffset);
+    this.lineTo(tract.n * 1.04, -this.noseOffset);
     this.ctx.stroke();
     this.ctx.globalAlpha = 0.9;
     this.ctx.globalAlpha = 1.0;
@@ -365,7 +365,7 @@ export class TractUIClass {
     //?
     this.drawText(4.5, 0.37, "h");
 
-    if (Glottis.isTouched || alwaysVoice) {
+    if (glottis.isTouched || alwaysVoice) {
       //voiced consonants
       this.drawText(31.5, fricatives, "ʒ");
       this.drawText(36, fricatives, "z");
@@ -394,25 +394,25 @@ export class TractUIClass {
     this.ctx.strokeStyle = "orchid";
     this.ctx.lineCap = "butt";
     this.ctx.globalAlpha = 0.3;
-    for (let i = 2; i < Tract.n - 1; i++) {
-      const lineWidth = Math.sqrt(Tract.maxAmplitude[i]) * 3;
+    for (let i = 2; i < tract.n - 1; i++) {
+      const lineWidth = Math.sqrt(tract.maxAmplitude[i]) * 3;
       if (lineWidth > 0) {
         this.ctx.beginPath();
         this.ctx.lineWidth = CANVAS_SCALE * lineWidth;
         this.moveTo(i, 0);
-        this.lineTo(i, Tract.diameter[i]);
+        this.lineTo(i, tract.diameter[i]);
         this.ctx.stroke();
       }
     }
-    for (let i = 1; i < Tract.noseLength - 1; i++) {
-      const lineWidth = Math.sqrt(Tract.noseMaxAmplitude[i]) * 3;
+    for (let i = 1; i < tract.noseLength - 1; i++) {
+      const lineWidth = Math.sqrt(tract.noseMaxAmplitude[i]) * 3;
       if (lineWidth > 0) {
         this.ctx.beginPath();
         this.ctx.lineWidth = CANVAS_SCALE * lineWidth;
-        this.moveTo(i + Tract.noseStart, -this.noseOffset);
+        this.moveTo(i + tract.noseStart, -this.noseOffset);
         this.lineTo(
-          i + Tract.noseStart,
-          -this.noseOffset - Tract.noseDiameter[i] * 0.9
+          i + tract.noseStart,
+          -this.noseOffset - tract.noseDiameter[i] * 0.9
         );
         this.ctx.stroke();
       }
@@ -463,7 +463,7 @@ export class TractUIClass {
     //circle for tongue position
     const angle =
       this.angleOffset +
-      (this.tongueIndex * this.angleScale * Math.PI) / (Tract.lipStart - 1);
+      (this.tongueIndex * this.angleScale * Math.PI) / (tract.lipStart - 1);
     const r2 = this.radius - this.scale * this.tongueDiameter;
     const x = this.originX - r2 * Math.cos(angle);
     const y = this.originY - r2 * Math.sin(angle);
@@ -489,26 +489,26 @@ export class TractUIClass {
   drawPitchControl() {
     const w = 9;
     const h = 15;
-    if (Glottis.x) {
+    if (glottis.x) {
       this.ctx.lineWidth = CANVAS_SCALE * 4;
       this.ctx.strokeStyle = "orchid";
       this.ctx.globalAlpha = 0.7;
       this.ctx.beginPath();
       this.ctx.moveTo(
-        CANVAS_SCALE * (Glottis.x - w),
-        CANVAS_SCALE * (Glottis.y - h)
+        CANVAS_SCALE * (glottis.x - w),
+        CANVAS_SCALE * (glottis.y - h)
       );
       this.ctx.lineTo(
-        CANVAS_SCALE * (Glottis.x + w),
-        CANVAS_SCALE * (Glottis.y - h)
+        CANVAS_SCALE * (glottis.x + w),
+        CANVAS_SCALE * (glottis.y - h)
       );
       this.ctx.lineTo(
-        CANVAS_SCALE * (Glottis.x + w),
-        CANVAS_SCALE * (Glottis.y + h)
+        CANVAS_SCALE * (glottis.x + w),
+        CANVAS_SCALE * (glottis.y + h)
       );
       this.ctx.lineTo(
-        CANVAS_SCALE * (Glottis.x - w),
-        CANVAS_SCALE * (Glottis.y + h)
+        CANVAS_SCALE * (glottis.x - w),
+        CANVAS_SCALE * (glottis.y + h)
       );
       this.ctx.closePath();
       this.ctx.stroke();
@@ -519,15 +519,15 @@ export class TractUIClass {
   }
 
   setRestDiameter() {
-    for (let i = Tract.bladeStart; i < Tract.lipStart; i++) {
+    for (let i = tract.bladeStart; i < tract.lipStart; i++) {
       const t =
         (1.1 * Math.PI * (this.tongueIndex - i)) /
-        (Tract.tipStart - Tract.bladeStart);
+        (tract.tipStart - tract.bladeStart);
       const fixedTongueDiameter = 2 + (this.tongueDiameter - 2) / 1.5;
       let curve = (1.5 - fixedTongueDiameter + this.gridOffset) * Math.cos(t);
-      if (i == Tract.bladeStart - 2 || i == Tract.lipStart - 1) curve *= 0.8;
-      if (i == Tract.bladeStart || i == Tract.lipStart - 2) curve *= 0.94;
-      Tract.restDiameter[i] = 1.5 - curve;
+      if (i == tract.bladeStart - 2 || i == tract.lipStart - 1) curve *= 0.8;
+      if (i == tract.bladeStart || i == tract.lipStart - 2) curve *= 0.94;
+      tract.restDiameter[i] = 1.5 - curve;
     }
   }
 
@@ -536,14 +536,14 @@ export class TractUIClass {
       this.tongueTouch = null;
 
     if (this.tongueTouch == null) {
-      for (let j = 0; j < UI.touchesWithMouse.length; j++) {
-        const touch = UI.touchesWithMouse[j];
+      for (let j = 0; j < ui.touchesWithMouse.length; j++) {
+        const touch = ui.touchesWithMouse[j];
         if (!touch.alive) continue;
         if (touch.fricative_intensity == 1) continue; //only new touches will pass this
         const x = touch.x;
         const y = touch.y;
-        const index = TractUI.getIndex(x, y);
-        const diameter = TractUI.getDiameter(x, y);
+        const index = tractUI.getIndex(x, y);
+        const diameter = tractUI.getDiameter(x, y);
         if (
           index >= this.tongueLowerIndexBound - 4 &&
           index <= this.tongueUpperIndexBound + 4 &&
@@ -558,8 +558,8 @@ export class TractUIClass {
     if (this.tongueTouch != null) {
       const x = this.tongueTouch.x;
       const y = this.tongueTouch.y;
-      const index = TractUI.getIndex(x, y);
-      const diameter = TractUI.getDiameter(x, y);
+      const index = tractUI.getIndex(x, y);
+      const diameter = tractUI.getDiameter(x, y);
       let fromPoint =
         (this.outerTongueControlRadius - diameter) /
         (this.outerTongueControlRadius - this.innerTongueControlRadius);
@@ -584,20 +584,20 @@ export class TractUIClass {
     }
 
     this.setRestDiameter();
-    for (let i = 0; i < Tract.n; i++)
-      Tract.targetDiameter[i] = Tract.restDiameter[i];
+    for (let i = 0; i < tract.n; i++)
+      tract.targetDiameter[i] = tract.restDiameter[i];
 
     //other constrictions and nose
-    Tract.velumTarget = 0.01;
-    for (let j = 0; j < UI.touchesWithMouse.length; j++) {
-      const touch = UI.touchesWithMouse[j];
+    tract.velumTarget = 0.01;
+    for (let j = 0; j < ui.touchesWithMouse.length; j++) {
+      const touch = ui.touchesWithMouse[j];
       if (!touch.alive) continue;
       const x = touch.x;
       const y = touch.y;
-      const index = TractUI.getIndex(x, y);
-      let diameter = TractUI.getDiameter(x, y);
-      if (index > Tract.noseStart && diameter < -this.noseOffset) {
-        Tract.velumTarget = 0.4;
+      const index = tractUI.getIndex(x, y);
+      let diameter = tractUI.getDiameter(x, y);
+      if (index > tract.noseStart && diameter < -this.noseOffset) {
+        tract.velumTarget = 0.4;
       }
       temp.a = index;
       temp.b = diameter;
@@ -606,27 +606,27 @@ export class TractUIClass {
       if (diameter < 0) diameter = 0;
       let width = 2;
       if (index < 25) width = 10;
-      else if (index >= Tract.tipStart) width = 5;
-      else width = 10 - (5 * (index - 25)) / (Tract.tipStart - 25);
+      else if (index >= tract.tipStart) width = 5;
+      else width = 10 - (5 * (index - 25)) / (tract.tipStart - 25);
       if (
         index >= 2 &&
-        index < Tract.n &&
+        index < tract.n &&
         y < tractCanvas.height &&
         diameter < 3
       ) {
         const intIndex = Math.round(index);
         for (let i = -Math.ceil(width) - 1; i < width + 1; i++) {
-          if (intIndex + i < 0 || intIndex + i >= Tract.n) continue;
+          if (intIndex + i < 0 || intIndex + i >= tract.n) continue;
           let relpos = intIndex + i - index;
           relpos = Math.abs(relpos) - 0.5;
           let shrink;
           if (relpos <= 0) shrink = 0;
           else if (relpos > width) shrink = 1;
           else shrink = 0.5 * (1 - Math.cos((Math.PI * relpos) / width));
-          if (diameter < Tract.targetDiameter[intIndex + i]) {
-            Tract.targetDiameter[intIndex + i] =
+          if (diameter < tract.targetDiameter[intIndex + i]) {
+            tract.targetDiameter[intIndex + i] =
               diameter +
-              (Tract.targetDiameter[intIndex + i] - diameter) * shrink;
+              (tract.targetDiameter[intIndex + i] - diameter) * shrink;
           }
         }
       }

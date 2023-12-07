@@ -1,8 +1,8 @@
-import { AudioSystemClass } from "./AudioSystem";
-import { GlottisClass } from "./Glottis";
-import { TractClass } from "./Tract";
-import { TractUIClass } from "./TractUI";
-import { UIClass } from "./UI";
+import { AudioSystem } from "./AudioSystem";
+import { Glottis } from "./Glottis";
+import { Tract } from "./Tract";
+import { TractUI } from "./TractUI";
+import { UI } from "./UI";
 
 export let sampleRate: number;
 
@@ -15,11 +15,11 @@ export let noiseQ = 0.7;
 export let palePink = "#FFEEF5";
 export let isFirefox = false;
 
-export let UI: UIClass;
-export let AudioSystem: AudioSystemClass;
-export let Glottis: GlottisClass;
-export let Tract: TractClass;
-export let TractUI: TractUIClass;
+export let ui: UI;
+export let audioSystem: AudioSystem;
+export let glottis: Glottis;
+export let tract: Tract;
+export let tractUI: TractUI;
 
 export let backCanvas: HTMLCanvasElement;
 export let backCtx: CanvasRenderingContext2D;
@@ -69,24 +69,24 @@ export function setIsFirefox(value: boolean) {
   isFirefox = value;
 }
 
-export function setUI(value: UIClass) {
-  UI = value;
+export function setUI(value: UI) {
+  ui = value;
 }
 
-export function setAudioSystem(value: AudioSystemClass) {
-  AudioSystem = value;
+export function setAudioSystem(value: AudioSystem) {
+  audioSystem = value;
 }
 
-export function setGlottis(value: GlottisClass) {
-  Glottis = value;
+export function setGlottis(value: Glottis) {
+  glottis = value;
 }
 
-export function setTract(value: TractClass) {
-  Tract = value;
+export function setTract(value: Tract) {
+  tract = value;
 }
 
-export function setTractUI(value: TractUIClass) {
-  TractUI = value;
+export function setTractUI(value: TractUI) {
+  tractUI = value;
 }
 
 export function setBackCanvas(value: HTMLCanvasElement) {
