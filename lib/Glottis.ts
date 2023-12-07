@@ -13,6 +13,40 @@ import {
 } from "./globals";
 import { clamp } from "./math";
 
+const VIBRATO_AMOUNT = 0.005;
+const VIBRATO_FREQUENCY = 6;
+const KEYBOARD_TOP = 500;
+const KEYBOARD_LEFT = 0;
+const KEYBOARD_WIDTH = 600;
+const KEYBOARD_HEIGHT = 100;
+const SEMITONES = 20;
+const MARKS = [0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0];
+const BASE_NOTE = 87.3071; // F
+
+function drawBar(topFactor: number, bottomFactor: number, radius: number) {
+  backCtx.lineWidth = CANVAS_SCALE * radius * 2;
+  backCtx.beginPath();
+  backCtx.moveTo(
+    CANVAS_SCALE * (KEYBOARD_LEFT + radius),
+    CANVAS_SCALE * (KEYBOARD_TOP + topFactor * KEYBOARD_HEIGHT + radius)
+  );
+  backCtx.lineTo(
+    CANVAS_SCALE * (KEYBOARD_LEFT + KEYBOARD_WIDTH - radius),
+    CANVAS_SCALE * (KEYBOARD_TOP + topFactor * KEYBOARD_HEIGHT + radius)
+  );
+  backCtx.lineTo(
+    CANVAS_SCALE * (KEYBOARD_LEFT + KEYBOARD_WIDTH - radius),
+    CANVAS_SCALE * (KEYBOARD_TOP + bottomFactor * KEYBOARD_HEIGHT - radius)
+  );
+  backCtx.lineTo(
+    CANVAS_SCALE * (KEYBOARD_LEFT + radius),
+    CANVAS_SCALE * (KEYBOARD_TOP + bottomFactor * KEYBOARD_HEIGHT - radius)
+  );
+  backCtx.closePath();
+  backCtx.stroke();
+  backCtx.fill();
+}
+
 export class Glottis {
   timeInWaveform: number;
   oldFrequency: number;
@@ -23,8 +57,6 @@ export class Glottis {
   newTenseness: number;
   UITenseness: number;
   totalTime: number;
-  readonly vibratoAmount: number;
-  readonly vibratoFrequency: number;
   intensity: number;
   loudness: number;
   isTouched: boolean;
@@ -33,13 +65,6 @@ export class Glottis {
   touch: TouchT | null;
   x: number;
   y: number;
-  readonly keyboardTop: number;
-  readonly keyboardLeft: number;
-  readonly keyboardWidth: number;
-  readonly keyboardHeight: number;
-  readonly semitones: number;
-  readonly marks: number[];
-  readonly baseNote: number;
   waveformLength: number;
   frequency: number;
   Rd: number;
@@ -61,8 +86,6 @@ export class Glottis {
     this.newTenseness = 0.6;
     this.UITenseness = 0.6;
     this.totalTime = 0;
-    this.vibratoAmount = 0.005;
-    this.vibratoFrequency = 6;
     this.intensity = 0;
     this.loudness = 1;
     this.isTouched = false;
@@ -71,13 +94,6 @@ export class Glottis {
     this.touch = null;
     this.x = 240;
     this.y = 530;
-    this.keyboardTop = 500;
-    this.keyboardLeft = 0;
-    this.keyboardWidth = 600;
-    this.keyboardHeight = 100;
-    this.semitones = 20;
-    this.marks = [0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0];
-    this.baseNote = 87.3071; // F
     this.waveformLength = 0; // ?
     this.frequency = 0;
     this.Rd = 0;
@@ -100,17 +116,17 @@ export class Glottis {
     backCtx.lineCap = "round";
     backCtx.lineJoin = "round";
 
-    this.drawBar(0.0, 0.4, 8);
+    drawBar(0.0, 0.4, 8);
     backCtx.globalAlpha = 0.7;
-    this.drawBar(0.52, 0.72, 8);
+    drawBar(0.52, 0.72, 8);
 
     backCtx.strokeStyle = "orchid";
     backCtx.fillStyle = "orchid";
-    for (let i = 0; i < this.semitones; i++) {
-      const keyWidth = this.keyboardWidth / this.semitones;
-      const x = this.keyboardLeft + (i + 1 / 2) * keyWidth;
-      const y = this.keyboardTop;
-      if (this.marks[(i + 3) % 12] == 1) {
+    for (let i = 0; i < SEMITONES; i++) {
+      const keyWidth = KEYBOARD_WIDTH / SEMITONES;
+      const x = KEYBOARD_LEFT + (i + 1 / 2) * keyWidth;
+      const y = KEYBOARD_TOP;
+      if (MARKS[(i + 3) % 12] == 1) {
         backCtx.lineWidth = CANVAS_SCALE * 4;
         backCtx.globalAlpha = 0.4;
       } else {
@@ -121,7 +137,7 @@ export class Glottis {
       backCtx.moveTo(CANVAS_SCALE * x, CANVAS_SCALE * (y + 9));
       backCtx.lineTo(
         CANVAS_SCALE * x,
-        CANVAS_SCALE * (y + this.keyboardHeight * 0.4 - 9)
+        CANVAS_SCALE * (y + KEYBOARD_HEIGHT * 0.4 - 9)
       );
       backCtx.stroke();
 
@@ -131,11 +147,11 @@ export class Glottis {
       backCtx.beginPath();
       backCtx.moveTo(
         CANVAS_SCALE * x,
-        CANVAS_SCALE * (y + this.keyboardHeight * 0.52 + 6)
+        CANVAS_SCALE * (y + KEYBOARD_HEIGHT * 0.52 + 6)
       );
       backCtx.lineTo(
         CANVAS_SCALE * x,
-        CANVAS_SCALE * (y + this.keyboardHeight * 0.72 - 6)
+        CANVAS_SCALE * (y + KEYBOARD_HEIGHT * 0.72 - 6)
       );
       backCtx.stroke();
     }
@@ -167,34 +183,6 @@ export class Glottis {
     backCtx.globalAlpha = 1.0;
   }
 
-  drawBar(topFactor: number, bottomFactor: number, radius: number) {
-    backCtx.lineWidth = CANVAS_SCALE * radius * 2;
-    backCtx.beginPath();
-    backCtx.moveTo(
-      CANVAS_SCALE * (this.keyboardLeft + radius),
-      CANVAS_SCALE *
-        (this.keyboardTop + topFactor * this.keyboardHeight + radius)
-    );
-    backCtx.lineTo(
-      CANVAS_SCALE * (this.keyboardLeft + this.keyboardWidth - radius),
-      CANVAS_SCALE *
-        (this.keyboardTop + topFactor * this.keyboardHeight + radius)
-    );
-    backCtx.lineTo(
-      CANVAS_SCALE * (this.keyboardLeft + this.keyboardWidth - radius),
-      CANVAS_SCALE *
-        (this.keyboardTop + bottomFactor * this.keyboardHeight - radius)
-    );
-    backCtx.lineTo(
-      CANVAS_SCALE * (this.keyboardLeft + radius),
-      CANVAS_SCALE *
-        (this.keyboardTop + bottomFactor * this.keyboardHeight - radius)
-    );
-    backCtx.closePath();
-    backCtx.stroke();
-    backCtx.fill();
-  }
-
   drawArrow(l: number, ahw: number, ahl: number) {
     backCtx.lineWidth = CANVAS_SCALE * 2;
     backCtx.beginPath();
@@ -220,25 +208,25 @@ export class Glottis {
         const touch = ui.touchesWithMouse[j];
         if (!touch.alive) continue;
         this.isTouchingSomewhere = true;
-        if (touch.y < this.keyboardTop) continue;
+        if (touch.y < KEYBOARD_TOP) continue;
         this.touch = touch;
       }
     }
 
     if (this.touch != null) {
       this.isTouchingSomewhere = true;
-      let local_y = this.touch.y - this.keyboardTop - 10;
-      const local_x = this.touch.x - this.keyboardLeft;
-      local_y = clamp(local_y, 0, this.keyboardHeight - 26);
-      const semitone = (this.semitones * local_x) / this.keyboardWidth + 0.5;
-      glottis.UIFrequency = this.baseNote * Math.pow(2, semitone / 12);
+      let local_y = this.touch.y - KEYBOARD_TOP - 10;
+      const local_x = this.touch.x - KEYBOARD_LEFT;
+      local_y = clamp(local_y, 0, KEYBOARD_HEIGHT - 26);
+      const semitone = (SEMITONES * local_x) / KEYBOARD_WIDTH + 0.5;
+      glottis.UIFrequency = BASE_NOTE * Math.pow(2, semitone / 12);
       if (glottis.intensity == 0) glottis.smoothFrequency = glottis.UIFrequency;
       //Glottis.UIRd = 3*local_y / (this.keyboardHeight-20);
-      const t = clamp(1 - local_y / (this.keyboardHeight - 28), 0, 1);
+      const t = clamp(1 - local_y / (KEYBOARD_HEIGHT - 28), 0, 1);
       glottis.UITenseness = 1 - Math.cos(t * Math.PI * 0.5);
       glottis.loudness = Math.pow(glottis.UITenseness, 0.25);
       this.x = this.touch.x;
-      this.y = local_y + this.keyboardTop + 10;
+      this.y = local_y + KEYBOARD_TOP + 10;
     }
     glottis.isTouched = this.touch != null;
   }
@@ -282,8 +270,8 @@ export class Glottis {
   finishBlock() {
     let vibrato = 0;
     vibrato +=
-      this.vibratoAmount *
-      Math.sin(2 * Math.PI * this.totalTime * this.vibratoFrequency);
+      VIBRATO_AMOUNT *
+      Math.sin(2 * Math.PI * this.totalTime * VIBRATO_FREQUENCY);
     vibrato += 0.02 * noise.simplex1(this.totalTime * 4.07);
     vibrato += 0.04 * noise.simplex1(this.totalTime * 2.15);
     if (autoWobble) {
