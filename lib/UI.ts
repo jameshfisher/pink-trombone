@@ -22,13 +22,13 @@ export class UIClass {
   inAboutScreen: boolean;
   inInstructionsScreen: boolean;
   instructionsLine: number;
-  debugText: string;
-  touchesWithMouse: TouchT[];
+  readonly debugText: string;
+  readonly touchesWithMouse: TouchT[];
   mouseTouch: TouchT;
   mouseDown: boolean;
-  aboutButton: ButtonT;
-  alwaysVoiceButton: ButtonT;
-  autoWobbleButton: ButtonT;
+  readonly aboutButton: ButtonT;
+  readonly alwaysVoiceButton: ButtonT;
+  readonly autoWobbleButton: ButtonT;
 
   constructor() {
     this.width = 600;

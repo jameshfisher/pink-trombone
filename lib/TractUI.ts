@@ -16,25 +16,25 @@ import * as IMAGINARY from "./i18n";
 import { clamp } from "./math";
 
 export class TractUIClass {
-  originX: number;
-  originY: number;
-  radius: number;
-  scale: number;
+  readonly originX: number;
+  readonly originY: number;
+  readonly radius: number;
+  readonly scale: number;
   tongueIndex: number;
   tongueDiameter: number;
-  innerTongueControlRadius: number;
-  outerTongueControlRadius: number;
+  readonly innerTongueControlRadius: number;
+  readonly outerTongueControlRadius: number;
   tongueTouch: TouchT | null;
-  angleScale: number;
-  angleOffset: number;
-  noseOffset: number;
-  gridOffset: number;
-  fillColour: string;
-  lineColour: string;
+  readonly angleScale: number;
+  readonly angleOffset: number;
+  readonly noseOffset: number;
+  readonly gridOffset: number;
+  readonly fillColour: string;
+  readonly lineColour: string;
   ctx: CanvasRenderingContext2D;
-  tongueLowerIndexBound: number;
-  tongueUpperIndexBound: number;
-  tongueIndexCentre: number;
+  readonly tongueLowerIndexBound: number;
+  readonly tongueUpperIndexBound: number;
+  readonly tongueIndexCentre: number;
 
   constructor() {
     this.originX = 340;
