@@ -15,7 +15,7 @@ export const moveTowards = function (
 };
 
 export const gaussian = function () {
-  var s = 0;
-  for (var c = 0; c < 16; c++) s += Math.random();
+  let s = 0;
+  for (let c = 0; c < 16; c++) s += Math.random();
   return (s - 8) / 4;
 };

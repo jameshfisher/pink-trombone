@@ -40,7 +40,7 @@ export class GlottisClass {
   semitones: number;
   marks: number[];
   baseNote: number;
-  waveformLength: any;
+  waveformLength: number;
   frequency: number;
   Rd: number;
   alpha: number;
@@ -78,7 +78,7 @@ export class GlottisClass {
     this.semitones = 20;
     this.marks = [0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0];
     this.baseNote = 87.3071; // F
-
+    this.waveformLength = 0; // ?
     this.frequency = 0;
     this.Rd = 0;
     this.alpha = 0;
@@ -106,10 +106,10 @@ export class GlottisClass {
 
     backCtx.strokeStyle = "orchid";
     backCtx.fillStyle = "orchid";
-    for (var i = 0; i < this.semitones; i++) {
-      var keyWidth = this.keyboardWidth / this.semitones;
-      var x = this.keyboardLeft + (i + 1 / 2) * keyWidth;
-      var y = this.keyboardTop;
+    for (let i = 0; i < this.semitones; i++) {
+      const keyWidth = this.keyboardWidth / this.semitones;
+      const x = this.keyboardLeft + (i + 1 / 2) * keyWidth;
+      const y = this.keyboardTop;
       if (this.marks[(i + 3) % 12] == 1) {
         backCtx.lineWidth = CANVAS_SCALE * 4;
         backCtx.globalAlpha = 0.4;
@@ -216,8 +216,8 @@ export class GlottisClass {
     }
 
     if (this.touch == null) {
-      for (var j = 0; j < UI.touchesWithMouse.length; j++) {
-        var touch = UI.touchesWithMouse[j];
+      for (let j = 0; j < UI.touchesWithMouse.length; j++) {
+        const touch = UI.touchesWithMouse[j];
         if (!touch.alive) continue;
         this.isTouchingSomewhere = true;
         if (touch.y < this.keyboardTop) continue;
@@ -227,14 +227,14 @@ export class GlottisClass {
 
     if (this.touch != null) {
       this.isTouchingSomewhere = true;
-      var local_y = this.touch.y - this.keyboardTop - 10;
-      var local_x = this.touch.x - this.keyboardLeft;
+      let local_y = this.touch.y - this.keyboardTop - 10;
+      const local_x = this.touch.x - this.keyboardLeft;
       local_y = clamp(local_y, 0, this.keyboardHeight - 26);
-      var semitone = (this.semitones * local_x) / this.keyboardWidth + 0.5;
+      const semitone = (this.semitones * local_x) / this.keyboardWidth + 0.5;
       Glottis.UIFrequency = this.baseNote * Math.pow(2, semitone / 12);
       if (Glottis.intensity == 0) Glottis.smoothFrequency = Glottis.UIFrequency;
       //Glottis.UIRd = 3*local_y / (this.keyboardHeight-20);
-      var t = clamp(1 - local_y / (this.keyboardHeight - 28), 0, 1);
+      const t = clamp(1 - local_y / (this.keyboardHeight - 28), 0, 1);
       Glottis.UITenseness = 1 - Math.cos(t * Math.PI * 0.5);
       Glottis.loudness = Math.pow(Glottis.UITenseness, 0.25);
       this.x = this.touch.x;
@@ -244,17 +244,17 @@ export class GlottisClass {
   }
 
   runStep(lambda: number, noiseSource: number) {
-    var timeStep = 1.0 / sampleRate;
+    const timeStep = 1.0 / sampleRate;
     this.timeInWaveform += timeStep;
     this.totalTime += timeStep;
     if (this.timeInWaveform > this.waveformLength) {
       this.timeInWaveform -= this.waveformLength;
       this.setupWaveform(lambda);
     }
-    var out = this.normalizedLFWaveform(
+    let out = this.normalizedLFWaveform(
       this.timeInWaveform / this.waveformLength
     );
-    var aspiration =
+    let aspiration =
       this.intensity *
       (1 - Math.sqrt(this.UITenseness)) *
       this.getNoiseModulator() *
@@ -265,7 +265,7 @@ export class GlottisClass {
   }
 
   getNoiseModulator() {
-    var voiced =
+    const voiced =
       0.1 +
       0.2 *
         Math.max(
@@ -280,7 +280,7 @@ export class GlottisClass {
   }
 
   finishBlock() {
-    var vibrato = 0;
+    let vibrato = 0;
     vibrato +=
       this.vibratoAmount *
       Math.sin(2 * Math.PI * this.totalTime * this.vibratoFrequency);
@@ -319,37 +319,37 @@ export class GlottisClass {
   setupWaveform(lambda: number) {
     this.frequency =
       this.oldFrequency * (1 - lambda) + this.newFrequency * lambda;
-    var tenseness =
+    const tenseness =
       this.oldTenseness * (1 - lambda) + this.newTenseness * lambda;
     this.Rd = 3 * (1 - tenseness);
     this.waveformLength = 1.0 / this.frequency;
 
-    var Rd = this.Rd;
+    let Rd = this.Rd;
     if (Rd < 0.5) Rd = 0.5;
     if (Rd > 2.7) Rd = 2.7;
 
     // normalized to time = 1, Ee = 1
-    var Ra = -0.01 + 0.048 * Rd;
-    var Rk = 0.224 + 0.118 * Rd;
-    var Rg =
+    const Ra = -0.01 + 0.048 * Rd;
+    const Rk = 0.224 + 0.118 * Rd;
+    const Rg =
       ((Rk / 4) * (0.5 + 1.2 * Rk)) / (0.11 * Rd - Ra * (0.5 + 1.2 * Rk));
 
-    var Ta = Ra;
-    var Tp = 1 / (2 * Rg);
-    var Te = Tp + Tp * Rk; //
+    const Ta = Ra;
+    const Tp = 1 / (2 * Rg);
+    const Te = Tp + Tp * Rk; //
 
-    var epsilon = 1 / Ta;
-    var shift = Math.exp(-epsilon * (1 - Te));
-    var Delta = 1 - shift; //divide by this to scale RHS
+    const epsilon = 1 / Ta;
+    const shift = Math.exp(-epsilon * (1 - Te));
+    const Delta = 1 - shift; //divide by this to scale RHS
 
-    var RHSIntegral = (1 / epsilon) * (shift - 1) + (1 - Te) * shift;
+    let RHSIntegral = (1 / epsilon) * (shift - 1) + (1 - Te) * shift;
     RHSIntegral = RHSIntegral / Delta;
 
-    var totalLowerIntegral = -(Te - Tp) / 2 + RHSIntegral;
-    var totalUpperIntegral = -totalLowerIntegral;
+    const totalLowerIntegral = -(Te - Tp) / 2 + RHSIntegral;
+    const totalUpperIntegral = -totalLowerIntegral;
 
-    var omega = Math.PI / Tp;
-    var s = Math.sin(omega * Te);
+    const omega = Math.PI / Tp;
+    const s = Math.sin(omega * Te);
     // need E0*e^(alpha*Te)*s = -1 (to meet the return at -1)
     // and E0*e^(alpha*Tp/2) * Tp*2/pi = totalUpperIntegral
     //             (our approximation of the integral up to Tp)
@@ -358,10 +358,10 @@ export class GlottisClass {
     // dividing the second by the first,
     // letting y = x^(Tp/2 - Te),
     // y * Tp*2 / (pi*s) = -totalUpperIntegral;
-    var y = (-Math.PI * s * totalUpperIntegral) / (Tp * 2);
-    var z = Math.log(y);
-    var alpha = z / (Tp / 2 - Te);
-    var E0 = -1 / (s * Math.exp(alpha * Te));
+    const y = (-Math.PI * s * totalUpperIntegral) / (Tp * 2);
+    const z = Math.log(y);
+    const alpha = z / (Tp / 2 - Te);
+    const E0 = -1 / (s * Math.exp(alpha * Te));
     this.alpha = alpha;
     this.E0 = E0;
     this.epsilon = epsilon;

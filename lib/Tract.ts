@@ -2,8 +2,8 @@ import { AudioSystem, Glottis, Tract, UI, sampleRate } from "./globals";
 import { clamp, moveTowards } from "./math";
 
 export class TractClass {
-  lipOutput: any;
-  noseOutput: any;
+  lipOutput: number;
+  noseOutput: number;
   n: number;
   bladeStart: number;
   tipStart: number;
@@ -40,9 +40,9 @@ export class TractClass {
   newReflectionLeft: number;
   newReflectionRight: number;
   newReflectionNose: number;
-  reflectionLeft: any;
-  reflectionRight: any;
-  reflectionNose: any;
+  reflectionLeft: number;
+  reflectionRight: number;
+  reflectionNose: number;
 
   constructor() {
     this.n = 44;
@@ -66,8 +66,8 @@ export class TractClass {
     this.restDiameter = new Float64Array(this.n);
     this.targetDiameter = new Float64Array(this.n);
     this.newDiameter = new Float64Array(this.n);
-    for (var i = 0; i < this.n; i++) {
-      var diameter = 0;
+    for (let i = 0; i < this.n; i++) {
+      let diameter = 0;
       if (i < (7 * this.n) / 44 - 0.5) diameter = 0.6;
       else if (i < (12 * this.n) / 44) diameter = 1.1;
       else diameter = 1.5;
@@ -96,9 +96,9 @@ export class TractClass {
     this.noseDiameter = new Float64Array(this.noseLength);
     this.noseA = new Float64Array(this.noseLength);
     this.noseMaxAmplitude = new Float64Array(this.noseLength);
-    for (var i = 0; i < this.noseLength; i++) {
+    for (let i = 0; i < this.noseLength; i++) {
       let diameter: number;
-      var d = 2 * (i / this.noseLength);
+      const d = 2 * (i / this.noseLength);
       if (d < 1) diameter = 0.4 + 1.6 * d;
       else diameter = 0.5 + 1.5 * (2 - d);
       diameter = Math.min(diameter, 1.9);
@@ -108,19 +108,23 @@ export class TractClass {
       this.newReflectionRight =
       this.newReflectionNose =
         0;
+    this.reflectionLeft = 0;
+    this.reflectionRight = 0;
+    this.reflectionNose = 0;
+
     this.calculateReflections();
     this.calculateNoseReflections();
     this.noseDiameter[0] = this.velumTarget;
   }
 
   reshapeTract(deltaTime: number) {
-    var amount = deltaTime * this.movementSpeed;
-    var newLastObstruction = -1;
-    for (var i = 0; i < this.n; i++) {
-      var diameter = this.diameter[i];
-      var targetDiameter = this.targetDiameter[i];
+    let amount = deltaTime * this.movementSpeed;
+    let newLastObstruction = -1;
+    for (let i = 0; i < this.n; i++) {
+      const diameter = this.diameter[i];
+      const targetDiameter = this.targetDiameter[i];
       if (diameter <= 0) newLastObstruction = i;
-      var slowReturn;
+      let slowReturn;
       if (i < this.noseStart) slowReturn = 0.6;
       else if (i >= this.tipStart) slowReturn = 1.0;
       else
@@ -153,10 +157,10 @@ export class TractClass {
   }
 
   calculateReflections() {
-    for (var i = 0; i < this.n; i++) {
+    for (let i = 0; i < this.n; i++) {
       this.A[i] = this.diameter[i] * this.diameter[i]; //ignoring PI etc.
     }
-    for (var i = 1; i < this.n; i++) {
+    for (let i = 1; i < this.n; i++) {
       this.reflection[i] = this.newReflection[i];
       if (this.A[i] == 0)
         this.newReflection[i] = 0.999; //to prevent some bad behaviour if 0
@@ -170,7 +174,7 @@ export class TractClass {
     this.reflectionLeft = this.newReflectionLeft;
     this.reflectionRight = this.newReflectionRight;
     this.reflectionNose = this.newReflectionNose;
-    var sum =
+    const sum =
       this.A[this.noseStart] + this.A[this.noseStart + 1] + this.noseA[0];
     this.newReflectionLeft = (2 * this.A[this.noseStart] - sum) / sum;
     this.newReflectionRight = (2 * this.A[this.noseStart + 1] - sum) / sum;
@@ -178,10 +182,10 @@ export class TractClass {
   }
 
   calculateNoseReflections() {
-    for (var i = 0; i < this.noseLength; i++) {
+    for (let i = 0; i < this.noseLength; i++) {
       this.noseA[i] = this.noseDiameter[i] * this.noseDiameter[i];
     }
-    for (var i = 1; i < this.noseLength; i++) {
+    for (let i = 1; i < this.noseLength; i++) {
       this.noseReflection[i] =
         (this.noseA[i - 1] - this.noseA[i]) /
         (this.noseA[i - 1] + this.noseA[i]);
@@ -189,7 +193,7 @@ export class TractClass {
   }
 
   runStep(glottalOutput: number, turbulenceNoise: number, lambda: number) {
-    var updateAmplitudes = Math.random() < 0.1;
+    const updateAmplitudes = Math.random() < 0.1;
 
     //mouth
     this.processTransients();
@@ -200,17 +204,17 @@ export class TractClass {
       this.L[0] * this.glottalReflection + glottalOutput;
     this.junctionOutputL[this.n] = this.R[this.n - 1] * this.lipReflection;
 
-    for (var i = 1; i < this.n; i++) {
-      var r =
+    for (let i = 1; i < this.n; i++) {
+      const r =
         this.reflection[i] * (1 - lambda) + this.newReflection[i] * lambda;
-      var w = r * (this.R[i - 1] + this.L[i]);
+      const w = r * (this.R[i - 1] + this.L[i]);
       this.junctionOutputR[i] = this.R[i - 1] - w;
       this.junctionOutputL[i] = this.L[i] + w;
     }
 
     //now at junction with nose
-    var i = this.noseStart;
-    var r =
+    const i = this.noseStart;
+    let r =
       this.newReflectionLeft * (1 - lambda) + this.reflectionLeft * lambda;
     this.junctionOutputL[i] =
       r * this.R[i - 1] + (1 + r) * (this.noseL[0] + this.L[i]);
@@ -221,7 +225,7 @@ export class TractClass {
     this.noseJunctionOutputR[0] =
       r * this.noseL[0] + (1 + r) * (this.L[i] + this.R[i - 1]);
 
-    for (var i = 0; i < this.n; i++) {
+    for (let i = 0; i < this.n; i++) {
       // this.R[i] = this.junctionOutputR[i]*0.999;
       // this.L[i] = this.junctionOutputL[i+1]*0.999;
 
@@ -229,7 +233,7 @@ export class TractClass {
       this.L[i] = clamp(this.junctionOutputL[i + 1] * 0.999, -1, 1);
 
       if (updateAmplitudes) {
-        var amplitude = Math.abs(this.R[i] + this.L[i]);
+        const amplitude = Math.abs(this.R[i] + this.L[i]);
         if (amplitude > this.maxAmplitude[i]) this.maxAmplitude[i] = amplitude;
         else this.maxAmplitude[i] *= 0.999;
       }
@@ -241,13 +245,13 @@ export class TractClass {
     this.noseJunctionOutputL[this.noseLength] =
       this.noseR[this.noseLength - 1] * this.lipReflection;
 
-    for (var i = 1; i < this.noseLength; i++) {
-      var w = this.noseReflection[i] * (this.noseR[i - 1] + this.noseL[i]);
+    for (let i = 1; i < this.noseLength; i++) {
+      const w = this.noseReflection[i] * (this.noseR[i - 1] + this.noseL[i]);
       this.noseJunctionOutputR[i] = this.noseR[i - 1] - w;
       this.noseJunctionOutputL[i] = this.noseL[i] + w;
     }
 
-    for (var i = 0; i < this.noseLength; i++) {
+    for (let i = 0; i < this.noseLength; i++) {
       // this.noseR[i] = this.noseJunctionOutputR[i] * this.fade;
       // this.noseL[i] = this.noseJunctionOutputL[i+1] * this.fade;
 
@@ -255,7 +259,7 @@ export class TractClass {
       this.noseL[i] = clamp(this.noseJunctionOutputL[i + 1] * 0.999, -1, 1);
 
       if (updateAmplitudes) {
-        var amplitude = Math.abs(this.noseR[i] + this.noseL[i]);
+        const amplitude = Math.abs(this.noseR[i] + this.noseL[i]);
         if (amplitude > this.noseMaxAmplitude[i])
           this.noseMaxAmplitude[i] = amplitude;
         else this.noseMaxAmplitude[i] *= 0.999;
@@ -271,7 +275,7 @@ export class TractClass {
   }
 
   addTransient(position: number) {
-    var trans: Transient = {
+    const trans: Transient = {
       position: position,
       timeAlive: 0,
       lifeTime: 0.2,
@@ -282,16 +286,16 @@ export class TractClass {
   }
 
   processTransients() {
-    for (var i = 0; i < this.transients.length; i++) {
-      var trans = this.transients[i];
-      var amplitude =
+    for (let i = 0; i < this.transients.length; i++) {
+      const trans = this.transients[i];
+      const amplitude =
         trans.strength * Math.pow(2, -trans.exponent * trans.timeAlive);
       this.R[trans.position] += amplitude / 2;
       this.L[trans.position] += amplitude / 2;
       trans.timeAlive += 1.0 / (sampleRate * 2);
     }
-    for (var i = this.transients.length - 1; i >= 0; i--) {
-      var trans = this.transients[i];
+    for (let i = this.transients.length - 1; i >= 0; i--) {
+      const trans = this.transients[i];
       if (trans.timeAlive > trans.lifeTime) {
         this.transients.splice(i, 1);
       }
@@ -299,11 +303,11 @@ export class TractClass {
   }
 
   addTurbulenceNoise(turbulenceNoise: number) {
-    for (var j = 0; j < UI.touchesWithMouse.length; j++) {
-      var touch = UI.touchesWithMouse[j];
+    for (let j = 0; j < UI.touchesWithMouse.length; j++) {
+      const touch = UI.touchesWithMouse[j];
       if (touch.index < 2 || touch.index > Tract.n) continue;
       if (touch.diameter <= 0) continue;
-      var intensity = touch.fricative_intensity;
+      const intensity = touch.fricative_intensity;
       if (intensity == 0) continue;
       this.addTurbulenceNoiseAtIndex(
         0.66 * turbulenceNoise * intensity,
@@ -318,13 +322,13 @@ export class TractClass {
     index: number,
     diameter: number
   ) {
-    var i = Math.floor(index);
-    var delta = index - i;
+    const i = Math.floor(index);
+    const delta = index - i;
     turbulenceNoise *= Glottis.getNoiseModulator();
-    var thinness0 = clamp(8 * (0.7 - diameter), 0, 1);
-    var openness = clamp(30 * (diameter - 0.3), 0, 1);
-    var noise0 = turbulenceNoise * (1 - delta) * thinness0 * openness;
-    var noise1 = turbulenceNoise * delta * thinness0 * openness;
+    const thinness0 = clamp(8 * (0.7 - diameter), 0, 1);
+    const openness = clamp(30 * (diameter - 0.3), 0, 1);
+    const noise0 = turbulenceNoise * (1 - delta) * thinness0 * openness;
+    const noise1 = turbulenceNoise * delta * thinness0 * openness;
     this.R[i + 1] += noise0 / 2;
     this.L[i + 1] += noise0 / 2;
     this.R[i + 2] += noise1 / 2;

@@ -52,8 +52,8 @@ export function start(
 }
 
 function addLanguageSwitcher() {
-  var code = "";
-  var name = "";
+  let code = "";
+  let name = "";
   if (IMAGINARY.i18n.getLang() === "en") {
     code = "de";
     name = "Deutsch";

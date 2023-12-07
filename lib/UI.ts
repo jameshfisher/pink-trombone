@@ -88,7 +88,7 @@ export class UIClass {
   }
 
   drawAboutScreen() {
-    var ctx = tractCtx;
+    const ctx = tractCtx;
     ctx.globalAlpha = 0.8;
     ctx.fillStyle = "white";
     ctx.rect(0, 0, CANVAS_SCALE * 600, CANVAS_SCALE * 600);
@@ -98,7 +98,7 @@ export class UIClass {
   }
 
   drawAboutText() {
-    var ctx = tractCtx;
+    const ctx = tractCtx;
     ctx.globalAlpha = 1.0;
     ctx.fillStyle = "#C070C6";
     ctx.strokeStyle = "#C070C6";
@@ -136,9 +136,9 @@ export class UIClass {
     }
   }
 
-  drawInstructionsScreen(this: any) {
+  drawInstructionsScreen() {
     AudioSystem.mute();
-    var ctx = tractCtx;
+    const ctx = tractCtx;
     ctx.globalAlpha = 0.85;
     ctx.fillStyle = "white";
     ctx.rect(0, 0, 600, 600);
@@ -237,10 +237,10 @@ export class UIClass {
     }
 
     if (this.inInstructionsScreen) {
-      var touches = event.changedTouches;
+      const touches = event.changedTouches;
       let x: number | undefined;
       let y: number | undefined;
-      for (var j = 0; j < touches.length; j++) {
+      for (let j = 0; j < touches.length; j++) {
         x = ((touches[j].pageX - this.left_margin) / this.width) * 600;
         y = ((touches[j].pageY - this.top_margin) / this.width) * 600;
       }
@@ -248,11 +248,11 @@ export class UIClass {
       return;
     }
 
-    var touches = event.changedTouches;
-    for (var j = 0; j < touches.length; j++) {
+    const touches = event.changedTouches;
+    for (let j = 0; j < touches.length; j++) {
       const x = ((touches[j].pageX - this.left_margin) / this.width) * 600;
       const y = ((touches[j].pageY - this.top_margin) / this.width) * 600;
-      var touch: TouchT = {
+      const touch: TouchT = {
         startTime: time,
         endTime: 0,
         fricative_intensity: 0,
@@ -271,7 +271,7 @@ export class UIClass {
   }
 
   getTouchById(id: unknown) {
-    for (var j = 0; j < UI.touchesWithMouse.length; j++) {
+    for (let j = 0; j < UI.touchesWithMouse.length; j++) {
       if (UI.touchesWithMouse[j].id == id && UI.touchesWithMouse[j].alive)
         return UI.touchesWithMouse[j];
     }
@@ -279,9 +279,9 @@ export class UIClass {
   }
 
   moveTouches(event: TouchEvent) {
-    var touches = event.changedTouches;
-    for (var j = 0; j < touches.length; j++) {
-      var touch = UI.getTouchById(touches[j].identifier);
+    const touches = event.changedTouches;
+    for (let j = 0; j < touches.length; j++) {
+      const touch = UI.getTouchById(touches[j].identifier);
       if (touch !== null) {
         touch.x = ((touches[j].pageX - UI.left_margin) / UI.width) * 600;
         touch.y = ((touches[j].pageY - UI.top_margin) / UI.width) * 600;
@@ -293,9 +293,9 @@ export class UIClass {
   }
 
   endTouches(event: TouchEvent) {
-    var touches = event.changedTouches;
-    for (var j = 0; j < touches.length; j++) {
-      var touch = this.getTouchById(touches[j].identifier);
+    const touches = event.changedTouches;
+    for (let j = 0; j < touches.length; j++) {
+      const touch = this.getTouchById(touches[j].identifier);
       if (touch !== null) {
         touch.alive = false;
         touch.endTime = time;
@@ -318,15 +318,15 @@ export class UIClass {
       return;
     }
     if (this.inInstructionsScreen) {
-      let x = ((event.pageX - tractCanvas.offsetLeft) / UI.width) * 600;
-      let y = ((event.pageY - tractCanvas.offsetTop) / UI.width) * 600;
+      const x = ((event.pageX - tractCanvas.offsetLeft) / UI.width) * 600;
+      const y = ((event.pageY - tractCanvas.offsetTop) / UI.width) * 600;
       UI.instructionsScreenHandleTouch(x, y);
       return;
     }
 
     const x = ((event.pageX - tractCanvas.offsetLeft) / UI.width) * 600;
     const y = ((event.pageY - tractCanvas.offsetTop) / UI.width) * 600;
-    var touch: TouchT = {
+    const touch: TouchT = {
       startTime: time,
       fricative_intensity: 0,
       endTime: 0,
@@ -345,7 +345,7 @@ export class UIClass {
   }
 
   moveMouse(event: MouseEvent) {
-    var touch = UI.mouseTouch;
+    const touch = UI.mouseTouch;
     if (!touch.alive) return;
     touch.x = ((event.pageX - tractCanvas.offsetLeft) / UI.width) * 600;
     touch.y = ((event.pageY - tractCanvas.offsetTop) / UI.width) * 600;
@@ -355,7 +355,7 @@ export class UIClass {
   }
 
   endMouse(_event: MouseEvent) {
-    var touch = UI.mouseTouch;
+    const touch = UI.mouseTouch;
     if (!touch.alive) return;
     touch.alive = false;
     touch.endTime = time;
@@ -370,9 +370,9 @@ export class UIClass {
   }
 
   updateTouches() {
-    var fricativeAttackTime = 0.1;
-    for (var j = this.touchesWithMouse.length - 1; j >= 0; j--) {
-      var touch = this.touchesWithMouse[j];
+    const fricativeAttackTime = 0.1;
+    for (let j = this.touchesWithMouse.length - 1; j >= 0; j--) {
+      const touch = this.touchesWithMouse[j];
       if (!touch.alive && time > touch.endTime + 1) {
         this.touchesWithMouse.splice(j, 1);
       } else if (touch.alive) {
